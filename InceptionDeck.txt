@@ -1,0 +1,205 @@
+# KoreaNow – Inception Deck (Draft)
+
+> Design direction: **Eater(https://www.eater.com) (editorial + lists)** × **Condé Nast Traveler(https://www.cntraveler.com) (experience-led travel tone)**  
+> Product type: **Korean local trend + culture guide for global audiences (EN first, JP next)**
+
+---
+
+## 1) Why are we here? (우리는 왜 여기에 있는가)
+
+K-culture 관심은 폭발적으로 커졌지만, 해외 사용자는 “한국인이 지금 실제로 소비하는 로컬 트렌드”에 접근하기 어렵다.  
+유튜브/틱톡은 글로벌 알고리즘 중심이라 로컬성이 약하고, 뉴스는 문화 트렌드를 빠르게 담지 못하며, 한국 커뮤니티는 언어·접근성 장벽이 높다.
+
+**KoreaNow는 한국 로컬 커뮤니티/앱 기반 데이터를 수집해 ‘지금 한국에서 현지인들에게 뜨는 진짜 문화 트렌드’를 해외 사용자에게 번역·요약·맥락 설명과 함께 제공한다.**
+
+---
+
+## 2) What are we building? (무엇을 만드는가)
+
+**실시간(혹은 준실시간) 한국 문화 트렌드 제공 플랫폼**
+- 데이터 소스에서 트렌드/콘텐츠 수집 → DB 적재
+- LLM으로 번역 + 요약 + 용어(문화) 설명 생성 → 번역 테이블 적재
+- 웹에서 “읽히는 콘텐츠”로 제공 (Eater × CNTraveler 스타일)
+
+**우리가 이 프로젝트에서 해야될 것** 
+- 우리가 할 것은 이미 주어진 DB에 적재된 데이터소스를 가져와서 웹사이트를 만드는 것이다. 
+
+**MVP 범위**
+- 카테고리: **K-Food** 중심
+- 콘텐츠 타입:
+  1) Restaurant List (가게 리스트)
+  2) Restaurant Detail (가게 상세 정보)
+  3) Editorial (테마형 글/큐레이션)
+  4) Editorial Content (본문)
+  5) Glossary (용어 설명)
+
+---
+
+## 3) What problem are we solving? (해결하려는 문제)
+
+### 해외 사용자 입장
+- 한국에서 “진짜 현지인들에게” 인기인 음식/장소를 알고 싶다
+- 한국어 장벽 때문에 커뮤니티/로컬 앱 정보를 못 본다
+- 맥락(용어/문화)을 몰라 이해가 안 된다
+- 단순 번역이 아니라 “추천처럼 읽히는” 큐레이션이 필요하다
+
+### 우리가 해결하는 방식
+- 로컬 데이터에서 트렌드를 가져오고
+- LLM으로 자연스러운 영어(현지화) 콘텐츠로 바꾸고
+- 구조화해(요약/불릿/용어) 웹에서 읽기 좋게 제공한다
+
+**우리가 여기서 해야될 것은 '구조화해(요약/불릿/용어) 웹에서 읽기 좋게 제공한다' 바로 이 부분이다.** 
+---
+
+## 4) Why now? (왜 지금인가)
+
+- K-culture 글로벌 수요는 계속 증가 중
+- 로컬 트렌드 접근은 여전히 막혀 있음 (폐쇄형 커뮤니티 + 한국어)
+- 번역/요약/맥락설명 생성이 LLM으로 **현실적인 비용과 품질로 가능**
+- “콘텐츠를 읽는 경험” 중심으로 디자인(매거진형)하면 해외 유저가 즉시 소비 가능
+
+---
+
+## 5) Who is it for? (페르소나)
+
+### Persona A: US/Global Food Traveler (20–40)
+- 여행 전 “로컬이 가는 곳”을 찾는다
+- 블로그/매거진형 글을 읽고 일정에 반영한다
+- 신뢰도와 맥락 설명을 중요하게 본다
+
+### Persona B: Japan 20s Female (K-Food & K-culture)
+- 한국에서 유행하는 음식/맛집을 빠르게 파악하고 싶다
+- 일본어 확장 시 핵심 타겟 (MVP는 EN 우선)
+
+### Persona C: US Teen / Pop Culture Explorer
+- 밈/트렌드/핫플을 빠르게 이해하고 싶다
+- (MVP 이후 확장 대상)
+
+---
+
+## 6) Core value proposition (핵심 가치)
+
+1. **한국인이 실제로 보고 있는 트렌드를 기반으로 한다**
+2. **번역 + 요약 + 문화적 맥락(용어/배경)까지 제공한다**
+3. **매거진처럼 읽히는 UX로 “소비 가능한 콘텐츠”로 만든다**
+4. **시간 기반으로 축적되어 트렌드 변화 추적이 가능하다**
+
+---
+
+## 7) Product principles (제품 원칙)
+
+- **Readable first**: 번역은 “문장”이 아니라 “콘텐츠”로 제공
+- **Structured output**: summary_short / bullets / glossary는 항상 생성
+- **Source-traceable**: 원문 URL/소스/수집시점을 보존
+- **Low maintenance**: 자동 수집·번역 파이프라인으로 운영 가능
+- **Legal safety**: 원문을 그대로 복제하지 않고(특히 저작권 문구 존재 시) 재작성/요약 중심
+
+---
+
+## 8) Solution outline (해결책 개요)
+
+### Data pipeline (K-Food / SikSin)
+1) 가게 리스트 크롤링 API 호출
+2) 원문 데이터 DB 적재
+3) 번역 큐에 푸시
+4) Queue worker가 병렬 처리로 LLM 호출 → 번역 테이블 적재
+
+### Detail crawl + translate
+1) 가게 URL들을 큐에 푸시
+2) Detail crawl worker가 병렬로 상세 수집 → 상세 테이블 적재
+3) 상세 번역 큐로 푸시
+4) Translation worker가 병렬로 LLM 호출 → 상세 번역 테이블 적재
+
+### Editorial + Content translate
+- Editorial 메타(제목/요약) 번역 테이블
+- Editorial 본문(content) 번역 테이블
+- Glossary는 본문/요약에서 필요한 항목만 생성
+
+---
+
+## 9) Information Architecture (IA) – MVP
+Home
+├─ Editorial List
+│ └─ Editorial Detail
+│ ├─ Restaurant Detail
+│ └─ Glossary (inline)
+├─ Restaurant List
+│ └─ Restaurant Detail
+└─ Glossary
+
+
+
+### UI direction
+- **Eater**: Home 구성(Featured + trending lists), 리스트 카드, 섹션 구조
+- **CN Traveler**: 에디토리얼 디테일의 경험 중심 톤, 여백/타이포로 긴 글을 편하게
+
+---
+
+## 10) Data model – 번역 저장 전략(요약)
+
+원문 테이블은 유지하고, 번역/요약/가공 결과는 **별도 translations 테이블**에 저장한다.
+- Join key: `site + url + lang` (FK 없이 로직 조인)
+- Unique: `(site, url, lang)` (upsert 기반)
+
+번역 테이블에는 아래 구조화 필드를 포함한다:
+- `*_translated` (title, summary, content 등)
+- `summary_short` (1–2문장)
+- `summary_bullets` (3–5개)
+- `glossary` (용어설명 key-value)
+- `model`, `prompt_version`, `translated_at`
+
+---
+
+## 11) What’s in / out (범위)
+
+### In (MVP)
+- K-Food (식신 기반)
+- EN 번역 + 요약 + glossary
+- Home / Editorial / Restaurant / Glossary 페이지
+- 파이프라인 자동화(크롤링→번역→적재)
+
+### Out (Later)
+- 회원/로그인, 개인화 추천
+- 댓글/커뮤니티 기능
+- K-Beauty/K-Pop/K-Meme 확장(추후)
+- 다국어(JP) 본격 확장(EN 안정화 후)
+
+---
+
+## 12) Success metrics (성공 지표)
+
+### 초기 KPI (MVP)
+- Editorial 상세 페이지 평균 체류시간 60초+
+- Home → Editorial Detail 클릭률(CTR) 확보
+- Glossary 클릭/열람률 (맥락설명 기능 사용률)
+- 인덱싱된 콘텐츠 수(주간 증가)
+- 7일 내 재방문율(작게라도)
+
+---
+
+## 13) Risks (리스크)
+
+- 크롤링 안정성 / 차단(Cloudflare 등)
+- 저작권/재배포 제한 문구 존재 콘텐츠 처리 방식
+- 번역 품질 편차(용어/톤 일관성)
+- 큐 병렬 처리로 인한 레이트리밋/쿼터 관리
+- 데이터 노이즈(트렌드 아닌 글/상업성 과다)
+
+---
+
+## 14) Open questions (열린 질문)
+
+- Editorial 컨텐츠는 “재작성” 기준을 어떻게 둘지?
+- Glossary 노출 UX: inline hover vs sidebar vs 하단 모음
+- Restaurant Detail에서 지도/내비 링크(구글맵/네이버/카카오) 우선순위
+- 트렌드 업데이트 주기(하루 2회 vs 더 자주)
+
+---
+
+## 15) Next steps (바로 다음 액션)
+
+1. MVP 페이지 개발 (Home / Editorial List / Editorial Detail / Restaurant Detail / Glossary)
+2. DB와 페이지 매핑 확정 (어떤 페이지가 어떤 테이블을 쓰는지)
+3. LLM 프롬프트 버전 관리(prompt_version) + 샘플 골든셋 확정
+4. 운영 관점: 실패 재시도/중복 방지(upsert) / 관측(로그/메트릭) 추가
+5. SEO 기본 세팅(슬러그/메타/OG/사이트맵) + 첫 콘텐츠 10개 퍼블리시

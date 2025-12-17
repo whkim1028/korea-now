@@ -1,0 +1,6 @@
+가게 상세 정보 개선사항 
+1. popular_resaurants_detail_translations의 description_translated도 컨텐츠에 추가해줘. (가게에 대한 설명글이야)
+2. 주소는 popular_resaurants_detail_translations의 address_translated 컬럼이야. 이게 진짜 상세 주소야. 
+3. 가게 상세에 이미지 배열은 본문 글에 녹여줘. 이미지들은 대부분 실제 메뉴의 사진들이니까 메뉴정보와 함께 볼 수 있도록 디자인해주면 돼. 
+4. popular_resaurants_detail_translations의 category_translated 컬럼도 정보에 추가해줘. 해당 식당의 음식 카테고리 정보야. 
+5. operating_hours_translated 컬럼도 정보에 추가해줘. 영업시간이야.  

@@ -1,0 +1,155 @@
+import { notFound } from 'next/navigation';
+import { getFullEditorial, getEditorials } from '@/lib/data/editorials';
+import GlossarySection from '@/components/GlossarySection';
+import Image from 'next/image';
+import type { Metadata } from 'next';
+
+interface EditorialPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+// Generate static params for all editorials
+export async function generateStaticParams() {
+  const editorials = await getEditorials();
+  return editorials.map((editorial) => ({
+    slug: encodeURIComponent(editorial.url),
+  }));
+}
+
+// Generate metadata for SEO
+export async function generateMetadata({ params }: EditorialPageProps): Promise<Metadata> {
+  const url = decodeURIComponent(params.slug);
+
+  // Extract site from URL (assuming URL pattern)
+  const site = url.includes('siksin.co.kr') ? 'siksin' : 'unknown';
+  const editorial = await getFullEditorial(site, url);
+
+  if (!editorial) {
+    return {
+      title: 'Editorial Not Found - KoreaNow',
+    };
+  }
+
+  return {
+    title: `${editorial.title_translated} - KoreaNow`,
+    description: editorial.summary_short || editorial.summary_translated,
+    openGraph: {
+      title: editorial.title_translated,
+      description: editorial.summary_short || editorial.summary_translated || '',
+      images: editorial.image_url ? [editorial.image_url] : [],
+    },
+  };
+}
+
+export default async function EditorialPage({ params }: EditorialPageProps) {
+  const url = decodeURIComponent(params.slug);
+
+  // Extract site from URL
+  const site = url.includes('siksin.co.kr') ? 'siksin' : 'unknown';
+  const editorial = await getFullEditorial(site, url);
+
+  if (!editorial) {
+    notFound();
+  }
+
+  // Merge glossaries from header and content
+  const combinedGlossary = {
+    ...(editorial.glossary || {}),
+    ...(editorial.content?.glossary || {}),
+  };
+
+  return (
+    <article className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <h1 className="text-5xl md:text-6xl font-serif font-bold text-gray-900 mb-6 leading-tight">
+            {editorial.title_translated}
+          </h1>
+
+          {editorial.summary_short && (
+            <p className="text-xl text-gray-600 leading-relaxed mb-8">
+              {editorial.summary_short}
+            </p>
+          )}
+
+          {editorial.summary_bullets && editorial.summary_bullets.length > 0 && (
+            <div className="bg-gray-50 rounded-lg p-6 mb-8">
+              <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4">
+                Key Highlights
+              </h2>
+              <ul className="space-y-3">
+                {editorial.summary_bullets.map((bullet, idx) => (
+                  <li key={idx} className="text-gray-700 flex items-start">
+                    <span className="text-gray-400 mr-3 mt-1">•</span>
+                    <span className="flex-1">{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Hero Image */}
+      {editorial.image_url && (
+        <div className="w-full h-96 relative border-b border-gray-200">
+          <Image
+            src={editorial.image_url}
+            alt={editorial.title_translated}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {editorial.content?.content_translated && (
+          <div className="prose prose-lg max-w-none">
+            <div
+              className="text-gray-800 leading-relaxed space-y-6"
+              dangerouslySetInnerHTML={{
+                __html: editorial.content.content_translated.replace(/\n/g, '<br />'),
+              }}
+            />
+          </div>
+        )}
+
+        {editorial.content?.content_bullets && editorial.content.content_bullets.length > 0 && (
+          <div className="mt-8 bg-gray-50 rounded-lg p-6">
+            <h2 className="text-lg font-serif font-bold text-gray-900 mb-4">
+              Summary
+            </h2>
+            <ul className="space-y-2">
+              {editorial.content.content_bullets.map((bullet, idx) => (
+                <li key={idx} className="text-gray-700 flex items-start">
+                  <span className="text-gray-400 mr-3">•</span>
+                  <span>{bullet}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Glossary */}
+        <GlossarySection glossary={combinedGlossary} />
+
+        {/* Source Link */}
+        <div className="mt-12 pt-8 border-t border-gray-200">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+          >
+            View Original Source →
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}

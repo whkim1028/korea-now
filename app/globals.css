@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .prose-custom {
+    @apply prose prose-lg max-w-none;
+    @apply prose-headings:font-serif prose-headings:text-gray-900;
+    @apply prose-p:text-gray-700 prose-p:leading-relaxed;
+    @apply prose-a:text-gray-900 prose-a:underline prose-a:decoration-2;
+    @apply prose-strong:text-gray-900;
+  }
+
+  /* Image overlay gradients */
+  .image-overlay-dark {
+    @apply absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent;
+  }
+
+  .image-overlay-soft {
+    @apply absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent;
+  }
+
+  .image-overlay-hover {
+    @apply absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300;
+  }
+
+  /* Image aspect ratios */
+  .aspect-magazine {
+    @apply aspect-[4/3];
+  }
+
+  .aspect-hero {
+    @apply aspect-[21/9];
+  }
+}
