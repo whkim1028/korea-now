@@ -3,11 +3,11 @@ import type { EditorialTranslation, EditorialContentTranslation, EditorialFull, 
 
 /**
  * Get all editorials (for list page)
- * Joins with food_editorial_posts to get original images
+ * Uses content_translations table and joins with posts_translations for metadata
  */
 export async function getEditorials(limit?: number): Promise<EditorialTranslation[]> {
   let query = supabase
-    .from('food_editorial_posts_translations')
+    .from('food_editorial_post_content_translations')
     .select('*')
     .eq('lang', 'en')
     .order('created_at', { ascending: false });
@@ -16,25 +16,37 @@ export async function getEditorials(limit?: number): Promise<EditorialTranslatio
     query = query.limit(limit);
   }
 
-  const { data: translations, error } = await query;
+  const { data: contentTranslations, error } = await query;
 
   if (error) {
     console.error('Error fetching editorials:', error);
     return [];
   }
 
-  if (!translations || translations.length === 0) {
+  if (!contentTranslations || contentTranslations.length === 0) {
     return [];
   }
 
+  // Get header metadata from posts_translations
+  const urls = contentTranslations.map(t => t.url);
+  const { data: headerTranslations } = await supabase
+    .from('food_editorial_posts_translations')
+    .select('*')
+    .eq('lang', 'en')
+    .in('url', urls);
+
   // Get original images from food_editorial_posts
-  const urls = translations.map(t => t.url);
   const { data: originals } = await supabase
     .from('food_editorial_posts')
     .select('url, image_url')
     .in('url', urls);
 
-  // Create a map of url -> image_url
+  // Create maps
+  const headerMap = new Map<string, any>();
+  if (headerTranslations) {
+    headerTranslations.forEach(h => headerMap.set(h.url, h));
+  }
+
   const imageMap = new Map<string, string>();
   if (originals) {
     originals.forEach(orig => {
@@ -44,11 +56,28 @@ export async function getEditorials(limit?: number): Promise<EditorialTranslatio
     });
   }
 
-  // Merge original images into translations
-  return translations.map(translation => ({
-    ...translation,
-    original_image_url: imageMap.get(translation.url),
-  }));
+  // Merge data using content_translations id
+  return contentTranslations.map(content => {
+    const header = headerMap.get(content.url);
+    return {
+      id: content.id, // Use content_translations id
+      site: content.site,
+      url: content.url,
+      lang: content.lang,
+      title_translated: header?.title_translated || '',
+      summary_translated: header?.summary_translated,
+      summary_short: header?.summary_short,
+      summary_bullets: header?.summary_bullets,
+      glossary: header?.glossary,
+      image_url: header?.image_url,
+      original_image_url: imageMap.get(content.url),
+      created_at: content.created_at,
+      updated_at: content.updated_at,
+      translated_at: content.translated_at,
+      model: content.model,
+      prompt_version: content.prompt_version,
+    };
+  });
 }
 
 /**
@@ -75,7 +104,7 @@ export async function getEditorialByUrl(site: string, url: string): Promise<Edit
  * Get editorial content by URL (for detail page body)
  */
 export async function getEditorialContent(site: string, url: string): Promise<EditorialContentTranslation | null> {
-  const { data, error } = await supabase
+  const { data: translation, error } = await supabase
     .from('food_editorial_post_content_translations')
     .select('*')
     .eq('site', site)
@@ -88,7 +117,72 @@ export async function getEditorialContent(site: string, url: string): Promise<Ed
     return null;
   }
 
-  return data;
+  // Get images from original content table
+  const { data: original } = await supabase
+    .from('food_editorial_post_content')
+    .select('images')
+    .eq('site', site)
+    .eq('url', url)
+    .single();
+
+  return {
+    ...translation,
+    images: original?.images || [],
+  };
+}
+
+/**
+ * Get full editorial data by ID (for detail page)
+ */
+export async function getFullEditorialById(id: string): Promise<EditorialFull | null> {
+  // Get editorial content
+  const { data: editorial, error: editorialError } = await supabase
+    .from('food_editorial_post_content_translations')
+    .select('*')
+    .eq('id', id)
+    .eq('lang', 'en')
+    .single();
+
+  if (editorialError || !editorial) {
+    console.error('Error fetching editorial:', editorialError);
+    return null;
+  }
+
+  // Get images from original content table
+  const { data: original } = await supabase
+    .from('food_editorial_post_content')
+    .select('images')
+    .eq('site', editorial.site)
+    .eq('url', editorial.url)
+    .single();
+
+  const content: EditorialContentTranslation = {
+    ...editorial,
+    images: original?.images || [],
+  };
+
+  // Get header metadata from posts_translations
+  const { data: header } = await supabase
+    .from('food_editorial_posts_translations')
+    .select('*')
+    .eq('site', editorial.site)
+    .eq('url', editorial.url)
+    .eq('lang', 'en')
+    .single();
+
+  // Get image_url from original posts table
+  const { data: originalPost } = await supabase
+    .from('food_editorial_posts')
+    .select('image_url')
+    .eq('url', editorial.url)
+    .single();
+
+  return {
+    ...(header || { site: editorial.site, url: editorial.url, lang: 'en', title_translated: '' }),
+    image_url: originalPost?.image_url,
+    content,
+    restaurants: [],
+  };
 }
 
 /**

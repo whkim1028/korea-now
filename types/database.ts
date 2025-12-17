@@ -3,7 +3,7 @@ export type Glossary = Record<string, string>;
 
 // Editorial (List / Metadata) - food_editorial_posts_translations
 export interface EditorialTranslation {
-  id?: number;
+  id?: string; // UUID type
   site: string;
   url: string;
   lang: string;
@@ -23,7 +23,7 @@ export interface EditorialTranslation {
 
 // Editorial Content (Full Body) - food_editorial_post_content_translations
 export interface EditorialContentTranslation {
-  id?: number;
+  id?: string; // UUID type
   site: string;
   url: string;
   lang: string;
@@ -31,6 +31,7 @@ export interface EditorialContentTranslation {
   content_summary?: string;
   content_bullets?: string[];
   glossary?: Glossary;
+  images?: string[]; // Images from food_editorial_post_content
   created_at?: string;
   updated_at?: string;
   translated_at?: string;

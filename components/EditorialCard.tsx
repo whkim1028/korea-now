@@ -8,11 +8,16 @@ interface EditorialCardProps {
 }
 
 export default function EditorialCard({ editorial, featured = false }: EditorialCardProps) {
-  // Create a slug from the URL for routing
-  const slug = encodeURIComponent(editorial.url);
+  // Use id as slug for routing (id is UUID string)
+  const slug = editorial.id || '';
 
   // Use original image from food_editorial_posts, fallback to translated image
   const imageUrl = editorial.original_image_url || editorial.image_url;
+
+  // Don't render if no id
+  if (!slug) {
+    return null;
+  }
 
   if (featured) {
     return (

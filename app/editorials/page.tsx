@@ -33,7 +33,7 @@ export default async function EditorialsPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
             {editorials.map((editorial) => (
-              <EditorialCard key={editorial.url} editorial={editorial} />
+              <EditorialCard key={editorial.id} editorial={editorial} />
             ))}
           </div>
         )}

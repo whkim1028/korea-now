@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
-import { getFullEditorial, getEditorials } from '@/lib/data/editorials';
+import { getFullEditorialById, getEditorials } from '@/lib/data/editorials';
 import GlossarySection from '@/components/GlossarySection';
+import ArticleContent from '@/components/ArticleContent';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
@@ -14,17 +15,15 @@ interface EditorialPageProps {
 export async function generateStaticParams() {
   const editorials = await getEditorials();
   return editorials.map((editorial) => ({
-    slug: encodeURIComponent(editorial.url),
-  }));
+    slug: editorial.id || '',
+  })).filter(item => item.slug !== '');
 }
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: EditorialPageProps): Promise<Metadata> {
-  const url = decodeURIComponent(params.slug);
+  const id = params.slug;
 
-  // Extract site from URL (assuming URL pattern)
-  const site = url.includes('siksin.co.kr') ? 'siksin' : 'unknown';
-  const editorial = await getFullEditorial(site, url);
+  const editorial = await getFullEditorialById(id);
 
   if (!editorial) {
     return {
@@ -44,11 +43,9 @@ export async function generateMetadata({ params }: EditorialPageProps): Promise<
 }
 
 export default async function EditorialPage({ params }: EditorialPageProps) {
-  const url = decodeURIComponent(params.slug);
+  const id = params.slug;
 
-  // Extract site from URL
-  const site = url.includes('siksin.co.kr') ? 'siksin' : 'unknown';
-  const editorial = await getFullEditorial(site, url);
+  const editorial = await getFullEditorialById(id);
 
   if (!editorial) {
     notFound();
@@ -93,30 +90,22 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
         </div>
       </div>
 
-      {/* Hero Image */}
-      {editorial.image_url && (
-        <div className="w-full h-96 relative border-b border-gray-200">
-          <Image
-            src={editorial.image_url}
-            alt={editorial.title_translated}
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-      )}
-
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {editorial.content?.content_translated && (
-          <div className="prose prose-lg max-w-none">
-            <div
-              className="text-gray-800 leading-relaxed space-y-6"
-              dangerouslySetInnerHTML={{
-                __html: editorial.content.content_translated.replace(/\n/g, '<br />'),
-              }}
-            />
+        {editorial.content?.content_summary && (
+          <div className="mb-8 p-6 bg-gray-50 rounded-lg border-l-4 border-gray-900">
+            <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">
+              Overview
+            </h2>
+            <p className="text-gray-700 leading-relaxed">{editorial.content.content_summary}</p>
           </div>
+        )}
+
+        {editorial.content?.content_translated && (
+          <ArticleContent
+            content={editorial.content.content_translated}
+            images={editorial.content.images}
+          />
         )}
 
         {editorial.content?.content_bullets && editorial.content.content_bullets.length > 0 && (
@@ -141,7 +130,7 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
         {/* Source Link */}
         <div className="mt-12 pt-8 border-t border-gray-200">
           <a
-            href={url}
+            href={editorial.url}
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
