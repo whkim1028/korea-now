@@ -10,13 +10,13 @@ export default function Header() {
           </Link>
 
           <nav className="flex space-x-8">
-            <Link href="/editorials" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-              Editorial
-            </Link>
-            <Link href="/restaurants" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+            <Link href="/restaurants" className="text-sm font-semibold text-gray-900 hover:text-gray-700 transition-colors">
               Restaurants
             </Link>
-            <Link href="/glossary" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+            <Link href="/editorials" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+              Editorial
+            </Link>
+            <Link href="/glossary" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
               Glossary
             </Link>
           </nav>
