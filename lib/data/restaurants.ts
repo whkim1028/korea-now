@@ -4,106 +4,80 @@ import type { RestaurantTranslation, RestaurantDetailTranslation, RestaurantDeta
 /**
  * Get all restaurants (for list page)
  * Joins with popular_restaurants to get original images
+ * Fetches category_translated from popular_restaurants_detail_translations
  * Supports region filtering with Seoul grouping (Gangnam + Gangbuk)
  */
 export async function getRestaurants(limit?: number, region?: string): Promise<RestaurantTranslation[]> {
   let query = supabase
     .from('popular_restaurants_localizations')
-    .select('*')
+    .select(`
+      *,
+      popular_restaurants!inner(image_url, url)
+    `)
     .eq('lang', 'en')
     .order('created_at', { ascending: false });
 
-  // When filtering by region, we need to fetch all records first
-  // Otherwise, set limit to optimize query
-  if (!region && limit) {
-    query = query.limit(limit);
-  } else if (region) {
-    // Fetch all records when filtering by region
-    query = query.limit(10000);
+  // Apply region filter at DB level
+  if (region) {
+    const regionUpper = region.toUpperCase();
+
+    if (regionUpper === 'SEOUL') {
+      // Seoul includes both Gangnam and Gangbuk
+      query = query.or('region_name.ilike.GANGNAM%,region_name.ilike.GANGBUK%');
+    } else {
+      // Match specific region code
+      query = query.ilike('region_name', `${regionUpper}%`);
+    }
   }
 
-  const { data: localizations, error } = await query;
+  // Apply limit
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching restaurants:', error);
     return [];
   }
 
-  if (!localizations || localizations.length === 0) {
+  if (!data || data.length === 0) {
     return [];
   }
 
-  console.log('=== getRestaurants DEBUG ===');
-  console.log('Selected region:', region);
-  console.log('Total fetched:', localizations.length);
+  // Get URLs for fetching category_translated
+  const urls = data
+    .map(item => item.popular_restaurants?.url)
+    .filter(Boolean) as string[];
 
-  // Filter by region code (extracted from region_name)
-  let filtered = localizations;
-  if (region) {
-    const regionUpper = region.toUpperCase();
+  // Fetch category_translated from popular_restaurants_detail_translations
+  let categoryMap = new Map<string, string>();
+  if (urls.length > 0) {
+    const { data: detailData } = await supabase
+      .from('popular_restaurants_detail_translations')
+      .select('url, category_translated')
+      .in('url', urls)
+      .eq('lang', 'en');
 
-    console.log('Filtering for region:', regionUpper);
-
-    if (regionUpper === 'SEOUL') {
-      // Seoul includes both Gangnam and Gangbuk
-      filtered = localizations.filter(item => {
-        if (!item.region_name) return false;
-        const code = item.region_name.split(' ')[0].toUpperCase();
-        return code === 'GANGNAM' || code === 'GANGBUK';
-      });
-    } else {
-      // Match specific region code
-      filtered = localizations.filter(item => {
-        if (!item.region_name) return false;
-        const code = item.region_name.split(' ')[0].toUpperCase();
-        return code === regionUpper;
+    if (detailData) {
+      detailData.forEach(detail => {
+        if (detail.url && detail.category_translated) {
+          categoryMap.set(detail.url, detail.category_translated);
+        }
       });
     }
-
-    console.log('After filtering:', filtered.length);
-    if (filtered.length > 0) {
-      console.log('Sample filtered regions:', filtered.slice(0, 3).map(f => f.region_name));
-    }
   }
 
-  // Apply limit after filtering
-  if (limit) {
-    filtered = filtered.slice(0, limit);
-  }
-
-  console.log('Final count after limit:', filtered.length);
-  console.log('===========================');
-
-  if (filtered.length === 0) {
-    return [];
-  }
-
-  // Get original images and URLs from popular_restaurants
-  const restaurantIds = filtered.map(r => r.restaurant_id).filter(Boolean);
-  const { data: originals } = await supabase
-    .from('popular_restaurants')
-    .select('id, image_url, url')
-    .in('id', restaurantIds);
-
-  // Create maps of restaurant_id -> image_url and url
-  const imageMap = new Map<string, string>();
-  const urlMap = new Map<string, string>();
-  if (originals) {
-    originals.forEach(orig => {
-      if (orig.image_url) {
-        imageMap.set(orig.id, orig.image_url);
-      }
-      if (orig.url) {
-        urlMap.set(orig.id, orig.url);
-      }
-    });
-  }
-
-  // Merge original images and URLs into localizations
-  return filtered.map(localization => ({
-    ...localization,
-    original_image_url: imageMap.get(localization.restaurant_id),
-    original_url: urlMap.get(localization.restaurant_id),
+  // Map joined data to include original_image_url, original_url, and category_translated
+  return data.map(item => ({
+    ...item,
+    original_image_url: item.popular_restaurants?.image_url,
+    original_url: item.popular_restaurants?.url,
+    category_translated: item.popular_restaurants?.url
+      ? categoryMap.get(item.popular_restaurants.url)
+      : undefined,
+    popular_restaurants: undefined, // Remove nested object
   }));
 }
 

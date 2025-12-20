@@ -57,6 +57,7 @@ export interface RestaurantTranslation {
   image_url?: string;
   original_image_url?: string; // From popular_restaurants table
   original_url?: string; // From popular_restaurants table
+  category_translated?: string; // From popular_restaurants_detail_translations table
   status?: string;
   created_at?: string;
   updated_at?: string;

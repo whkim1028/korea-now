@@ -15,32 +15,49 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
 
   return (
     <Link href={`/restaurants/${slug}`} className="group block">
-      <article className="relative overflow-hidden rounded-sm">
+      <article className="bg-white overflow-hidden transition-all duration-300 hover:shadow-2xl">
+        {/* Image Section */}
         {imageUrl && (
-          <div className="relative w-full h-80 overflow-hidden">
+          <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100">
             <Image
               src={imageUrl}
               alt={restaurant.name}
               fill
-              className="object-cover group-hover:scale-110 transition-transform duration-700"
+              className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             />
-            <div className="image-overlay-dark" />
-
-            {/* Text overlay on image */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
-              <div className="space-y-2">
-                <h3 className="text-2xl font-serif font-bold text-white leading-tight group-hover:text-gray-100 transition-colors">
-                  {restaurant.name}
-                </h3>
-                {restaurant.region_name && (
-                  <span className="inline-block px-2 py-1 text-xs text-white bg-white/20 backdrop-blur-sm rounded uppercase tracking-wide">
-                    {restaurant.region_name}
-                  </span>
-                )}
-              </div>
-            </div>
+            {/* Subtle gradient overlay for depth */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
         )}
+
+        {/* Content Section */}
+        <div className="p-6 space-y-4">
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
+            {restaurant.category_translated && (
+              <span className="inline-block px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded-full tracking-wide">
+                {restaurant.category_translated}
+              </span>
+            )}
+            {restaurant.region_name && (
+              <span className="inline-block px-3 py-1 text-xs font-medium text-gray-600 border border-gray-300 rounded-full uppercase tracking-wider">
+                {restaurant.region_name}
+              </span>
+            )}
+          </div>
+
+          {/* Title */}
+          <h3 className="text-2xl font-serif font-bold text-gray-900 leading-tight group-hover:text-gray-600 transition-colors duration-200">
+            {restaurant.name}
+          </h3>
+
+          {/* Description */}
+          {restaurant.summary_short && (
+            <p className="text-base text-gray-600 leading-relaxed line-clamp-3">
+              {restaurant.summary_short}
+            </p>
+          )}
+        </div>
       </article>
     </Link>
   );
