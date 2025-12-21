@@ -111,6 +111,8 @@ export interface RestaurantDetailTranslation {
   summary_short?: string;
   summary_bullets?: string[];
   glossary?: Glossary;
+  geo_w?: number; // latitude (위도)
+  geo_g?: number; // longitude (경도)
   created_at?: string;
   updated_at?: string;
   translated_at?: string;

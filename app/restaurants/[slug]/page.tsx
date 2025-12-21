@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { getFullRestaurantById, getRestaurants } from '@/lib/data/restaurants';
 import GlossarySection from '@/components/GlossarySection';
 import ImageCarousel from '@/components/ImageCarousel';
+import GoogleMap from '@/components/GoogleMap';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
@@ -310,6 +311,17 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
                   <dd className="text-gray-700">
                     {restaurant.detail?.address_translated || restaurant.address}
                   </dd>
+                  {/* Google Map */}
+                  {restaurant.detail?.geo_w && restaurant.detail?.geo_g && (
+                    <div className="mt-4">
+                      <GoogleMap
+                        lat={restaurant.detail.geo_w}
+                        lng={restaurant.detail.geo_g}
+                        name={restaurant.name}
+                        address={restaurant.detail.address_translated || restaurant.address}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
               {restaurant.detail?.operating_hours_translated && (
