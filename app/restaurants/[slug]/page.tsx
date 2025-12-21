@@ -6,6 +6,8 @@ import GoogleMap from '@/components/GoogleMap';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
+export const runtime = 'edge';
+
 interface RestaurantPageProps {
   params: {
     slug: string;

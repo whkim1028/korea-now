@@ -1,6 +1,8 @@
 import { getAllGlossaryEntries } from '@/lib/data/glossary';
 import type { Metadata } from 'next';
 
+export const runtime = 'edge';
+
 export const metadata: Metadata = {
   title: 'Glossary - KoreaNow',
   description: 'Korean cultural terms and concepts explained. Your guide to understanding Korean culture.',

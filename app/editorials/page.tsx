@@ -2,6 +2,8 @@ import { getEditorials } from '@/lib/data/editorials';
 import EditorialCard from '@/components/EditorialCard';
 import type { Metadata } from 'next';
 
+export const runtime = 'edge';
+
 export const metadata: Metadata = {
   title: 'Editorial - KoreaNow',
   description: 'Discover curated stories about Korean culture, food, and trends.',

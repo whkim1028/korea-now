@@ -5,6 +5,8 @@ import ArticleContent from '@/components/ArticleContent';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
+export const runtime = 'edge';
+
 interface EditorialPageProps {
   params: {
     slug: string;
