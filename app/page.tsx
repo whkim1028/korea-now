@@ -248,7 +248,7 @@ export default async function Home({
                   </span>
                 </div>
                 <h2 className="text-4xl md:text-5xl font-serif font-bold text-gray-900">
-                  Watch What's Trending in Korean Food
+                  Watch What&apos;s Trending in Korean Food
                 </h2>
                 <p className="text-lg text-gray-600 mt-3 max-w-2xl">
                   From mukbang to street food tours — see what Korea is watching right now

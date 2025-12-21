@@ -183,7 +183,7 @@ export default function RegionSearchBar({ regions, onRegionSelect }: RegionSearc
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div className="absolute z-20 w-full mt-2 bg-white rounded-lg shadow-2xl border border-gray-200 p-6 text-center">
-            <p className="text-gray-500">No regions found matching "{searchTerm}"</p>
+            <p className="text-gray-500">No regions found matching &quot;{searchTerm}&quot;</p>
           </div>
         </>
       )}

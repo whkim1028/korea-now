@@ -37,7 +37,7 @@ export default async function VideosPage() {
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-2xl leading-relaxed">
             The hottest mukbang, restaurant tours, and street food content from
-            Korea. Curated from YouTube's most popular videos.
+            Korea. Curated from YouTube&apos;s most popular videos.
           </p>
         </div>
       </div>
