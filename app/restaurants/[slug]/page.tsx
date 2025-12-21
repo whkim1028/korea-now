@@ -7,19 +7,12 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 interface RestaurantPageProps {
   params: {
     slug: string;
   };
-}
-
-// Generate static params for all restaurants
-export async function generateStaticParams() {
-  const restaurants = await getRestaurants();
-  return restaurants.map((restaurant) => ({
-    slug: restaurant.id,
-  }));
 }
 
 // Generate metadata for SEO

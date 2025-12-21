@@ -6,19 +6,12 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 interface EditorialPageProps {
   params: {
     slug: string;
   };
-}
-
-// Generate static params for all editorials
-export async function generateStaticParams() {
-  const editorials = await getEditorials();
-  return editorials.map((editorial) => ({
-    slug: editorial.id || '',
-  })).filter(item => item.slug !== '');
 }
 
 // Generate metadata for SEO
