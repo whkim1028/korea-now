@@ -124,7 +124,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
   // Prepare images for carousel - prioritize raw detail images, fallback to header images
   const images = restaurant.detailRaw?.image_urls && restaurant.detailRaw.image_urls.length > 0
     ? restaurant.detailRaw.image_urls
-    : [restaurant.original_image_url || restaurant.image_url].filter(Boolean);
+    : [restaurant.original_image_url || restaurant.image_url].filter((img): img is string => Boolean(img));
 
   // Get the original URL for the source link
   const sourceUrl = restaurant.original_url || restaurant.url;
