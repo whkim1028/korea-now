@@ -200,7 +200,7 @@ export async function getFullEditorial(site: string, url: string): Promise<Edito
 
   return {
     ...editorial,
-    content,
+    content: content ?? undefined,
     restaurants: [], // TODO: Implement restaurant extraction from content if needed
   };
 }
