@@ -239,8 +239,8 @@ export async function getFullRestaurantById(id: string): Promise<RestaurantFull 
 
   return {
     ...restaurant,
-    detail,
-    detailRaw,
+    detail: detail ?? undefined,
+    detailRaw: detailRaw ?? undefined,
   };
 }
 
@@ -262,8 +262,8 @@ export async function getFullRestaurant(site: string, url: string): Promise<Rest
 
   return {
     ...restaurant,
-    detail,
-    detailRaw,
+    detail: detail ?? undefined,
+    detailRaw: detailRaw ?? undefined,
   };
 }
 

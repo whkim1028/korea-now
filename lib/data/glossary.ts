@@ -21,7 +21,7 @@ export async function getAllGlossaryEntries(): Promise<GlossaryEntry[]> {
           if (!glossaryMap.has(term)) {
             glossaryMap.set(term, {
               term,
-              definition,
+              definition: typeof definition === 'string' ? definition : String(definition),
               source_type: 'editorial',
               source_url: item.url,
             });
@@ -45,7 +45,7 @@ export async function getAllGlossaryEntries(): Promise<GlossaryEntry[]> {
           if (!glossaryMap.has(term)) {
             glossaryMap.set(term, {
               term,
-              definition,
+              definition: typeof definition === 'string' ? definition : String(definition),
               source_type: 'editorial_content',
               source_url: item.url,
             });
