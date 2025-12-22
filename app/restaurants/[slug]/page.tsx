@@ -240,12 +240,14 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
         {/* Editorial Introduction */}
         {restaurant.detail?.description_translated && (
           <div className="mb-12">
-            <div
-              className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
-              dangerouslySetInnerHTML={{
-                __html: toHtmlString(restaurant.detail.description_translated),
-              }}
-            />
+            <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
+              <TextWithGlossary
+                text={typeof restaurant.detail.description_translated === 'string'
+                  ? restaurant.detail.description_translated
+                  : String(restaurant.detail.description_translated)}
+                glossary={combinedGlossary}
+              />
+            </div>
           </div>
         )}
 
@@ -292,7 +294,10 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
                     className="flex justify-between items-baseline py-3 px-4 hover:bg-gray-50 rounded-lg transition-colors group"
                   >
                     <span className="text-gray-800 flex-1 leading-relaxed group-hover:text-gray-900">
-                      {item.name}
+                      <TextWithGlossary
+                        text={item.name}
+                        glossary={combinedGlossary}
+                      />
                     </span>
                     {item.price && (
                       <span className="text-gray-900 font-semibold ml-6 whitespace-nowrap">
@@ -303,12 +308,14 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
                 ))}
               </div>
             ) : (
-              <div
-                className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
-                dangerouslySetInnerHTML={{
-                  __html: toHtmlString(restaurant.detail?.menus_translated || restaurant.menu),
-                }}
-              />
+              <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
+                <TextWithGlossary
+                  text={typeof (restaurant.detail?.menus_translated || restaurant.menu) === 'string'
+                    ? (restaurant.detail?.menus_translated || restaurant.menu)
+                    : String(restaurant.detail?.menus_translated || restaurant.menu || '')}
+                  glossary={combinedGlossary}
+                />
+              </div>
             )}
           </div>
         )}
@@ -362,12 +369,14 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
                   <dt className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-1">
                     Operating Hours
                   </dt>
-                  <dd
-                    className="text-gray-700"
-                    dangerouslySetInnerHTML={{
-                      __html: toHtmlString(restaurant.detail.operating_hours_translated),
-                    }}
-                  />
+                  <dd className="text-gray-700">
+                    <TextWithGlossary
+                      text={typeof restaurant.detail.operating_hours_translated === 'string'
+                        ? restaurant.detail.operating_hours_translated
+                        : String(restaurant.detail.operating_hours_translated)}
+                      glossary={combinedGlossary}
+                    />
+                  </dd>
                 </div>
               )}
               {restaurant.detailRaw?.phone && (
@@ -404,12 +413,14 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
                   <dt className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-1">
                     Facilities
                   </dt>
-                  <dd
-                    className="text-gray-700"
-                    dangerouslySetInnerHTML={{
-                      __html: toHtmlString(restaurant.detail.facilities_translated),
-                    }}
-                  />
+                  <dd className="text-gray-700">
+                    <TextWithGlossary
+                      text={typeof restaurant.detail.facilities_translated === 'string'
+                        ? restaurant.detail.facilities_translated
+                        : String(restaurant.detail.facilities_translated)}
+                      glossary={combinedGlossary}
+                    />
+                  </dd>
                 </div>
               )}
             </dl>
