@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation';
 import { getFullRestaurantById, getRestaurants } from '@/lib/data/restaurants';
 import GlossarySection from '@/components/GlossarySection';
 import ImageCarousel from '@/components/ImageCarousel';
+import MenuImageGallery from '@/components/MenuImageGallery';
 import GoogleMap from '@/components/GoogleMap';
+import TextWithGlossary from '@/components/TextWithGlossary';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
@@ -29,11 +31,26 @@ export async function generateMetadata({ params }: RestaurantPageProps): Promise
   const imageUrl = restaurant.original_image_url || restaurant.image_url;
 
   return {
-    title: `${restaurant.name} - KoreaNow`,
+    title: `${restaurant.name}`,
     description: restaurant.summary_short || `Discover ${restaurant.name} in Korea`,
     openGraph: {
+      type: 'website',
       title: restaurant.name,
-      description: restaurant.summary_short || '',
+      description: restaurant.summary_short || `Discover ${restaurant.name} in Korea`,
+      url: `https://koreanow.pages.dev/restaurants/${id}`,
+      siteName: 'KoreaNow',
+      locale: 'en_US',
+      images: imageUrl ? [{
+        url: imageUrl,
+        width: 1200,
+        height: 630,
+        alt: restaurant.name,
+      }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: restaurant.name,
+      description: restaurant.summary_short || `Discover ${restaurant.name} in Korea`,
       images: imageUrl ? [imageUrl] : [],
     },
   };
@@ -124,8 +141,34 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
   // Get the original URL for the source link
   const sourceUrl = restaurant.original_url || restaurant.url;
 
+  // Generate Schema.org JSON-LD for Restaurant
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Restaurant',
+    name: restaurant.detail?.name_translated || restaurant.name,
+    description: restaurant.summary_short || restaurant.detail?.summary_short || `Discover ${restaurant.name} in Korea`,
+    image: images.length > 0 ? images : undefined,
+    address: restaurant.detail?.address_translated ? {
+      '@type': 'PostalAddress',
+      streetAddress: restaurant.detail.address_translated,
+      addressCountry: 'KR',
+    } : undefined,
+    geo: restaurant.detail?.geo_w && restaurant.detail?.geo_g ? {
+      '@type': 'GeoCoordinates',
+      latitude: restaurant.detail.geo_w,
+      longitude: restaurant.detail.geo_g,
+    } : undefined,
+    url: `https://koreanow.pages.dev/restaurants/${id}`,
+    servesCuisine: 'Korean',
+  };
+
   return (
     <article className="min-h-screen bg-white">
+      {/* Schema.org JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero Section with Image Carousel */}
       {images.length > 0 && (
         <div className="relative">
@@ -138,7 +181,10 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
               </h1>
               {restaurant.detail?.summary_short && (
                 <p className="text-xl text-white/90 mb-4 drop-shadow-md max-w-2xl">
-                  {restaurant.detail.summary_short}
+                  <TextWithGlossary
+                    text={restaurant.detail.summary_short}
+                    glossary={combinedGlossary}
+                  />
                 </p>
               )}
               <div className="flex gap-2">
@@ -229,18 +275,10 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
 
             {/* Menu Images Gallery */}
             {restaurant.detailRaw?.image_urls && restaurant.detailRaw.image_urls.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                {restaurant.detailRaw.image_urls.map((imageUrl, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-lg overflow-hidden">
-                    <Image
-                      src={imageUrl}
-                      alt={`${restaurant.name} menu ${idx + 1}`}
-                      fill
-                      className="object-cover hover:scale-110 transition-transform duration-300"
-                    />
-                  </div>
-                ))}
-              </div>
+              <MenuImageGallery
+                images={restaurant.detailRaw.image_urls}
+                restaurantName={restaurant.name}
+              />
             )}
 
             {/* Menu List */}

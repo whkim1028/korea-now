@@ -2,20 +2,113 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import GlossaryTooltip from './GlossaryTooltip';
+import type { Glossary } from '@/types/database';
 
 interface ArticleContentProps {
   content: string;
   images?: string[];
+  glossary?: Glossary | Array<{term: string; explain: string}>;
 }
 
-export default function ArticleContent({ content, images = [] }: ArticleContentProps) {
+export default function ArticleContent({ content, images = [], glossary }: ArticleContentProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+
+  // Convert glossary to map
+  const glossaryMap = new Map<string, string>();
+  if (glossary) {
+    if (Array.isArray(glossary)) {
+      glossary.forEach(item => glossaryMap.set(item.term.toLowerCase(), item.explain));
+    } else {
+      Object.entries(glossary).forEach(([term, definition]) => {
+        if (typeof definition === 'string') {
+          glossaryMap.set(term.toLowerCase(), definition);
+        }
+      });
+    }
+  }
+
+  // Function to highlight glossary terms in text
+  const highlightGlossaryTerms = (text: string) => {
+    if (glossaryMap.size === 0) {
+      return text;
+    }
+
+    // Sort terms by length (longest first) to match longer phrases before shorter ones
+    const terms = Array.from(glossaryMap.keys()).sort((a, b) => b.length - a.length);
+
+    // Create regex pattern to match any of the glossary terms (case-insensitive, whole words)
+    const pattern = terms.map(term => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+    const regex = new RegExp(`\\b(${pattern})\\b`, 'gi');
+
+    const parts: Array<{type: 'text' | 'glossary'; content: string; definition?: string}> = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(text)) !== null) {
+      // Add text before match
+      if (match.index > lastIndex) {
+        parts.push({
+          type: 'text',
+          content: text.slice(lastIndex, match.index),
+        });
+      }
+
+      // Add glossary term
+      const matchedTerm = match[0];
+      const definition = glossaryMap.get(matchedTerm.toLowerCase());
+      if (definition) {
+        parts.push({
+          type: 'glossary',
+          content: matchedTerm,
+          definition,
+        });
+      }
+
+      lastIndex = match.index + matchedTerm.length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push({
+        type: 'text',
+        content: text.slice(lastIndex),
+      });
+    }
+
+    return parts;
+  };
+
+  // Render text with glossary tooltips
+  const renderTextWithGlossary = (text: string, key: string) => {
+    const parts = highlightGlossaryTerms(text);
+
+    if (typeof parts === 'string') {
+      return text;
+    }
+
+    return (
+      <>
+        {parts.map((part, idx) => {
+          if (part.type === 'glossary' && part.definition) {
+            return (
+              <GlossaryTooltip
+                key={`${key}-glossary-${idx}`}
+                term={part.content}
+                definition={part.definition}
+              />
+            );
+          }
+          return <span key={`${key}-text-${idx}`}>{part.content}</span>;
+        })}
+      </>
+    );
+  };
 
   // Split content by double newlines for paragraphs
   const paragraphs = content.split(/\n\n+/).filter(p => p.trim());
 
   // Calculate where to insert images (evenly distributed between paragraphs)
-  // Map: paragraphIndex -> array of image indices to show after that paragraph
   const imagePositions = new Map<number, number[]>();
   if (images.length > 0 && paragraphs.length > 1) {
     for (let i = 0; i < images.length; i++) {
@@ -72,7 +165,7 @@ export default function ArticleContent({ content, images = [] }: ArticleContentP
                 <p className="text-lg text-gray-800 leading-relaxed">
                   {lines.map((line, lineIdx) => (
                     <span key={lineIdx}>
-                      {line}
+                      {renderTextWithGlossary(line, `${idx}-${lineIdx}`)}
                       {lineIdx < lines.length - 1 && <br />}
                     </span>
                   ))}

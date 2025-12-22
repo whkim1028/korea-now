@@ -33,8 +33,20 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">About</h4>
-            <p className="text-sm text-gray-600">
+            <h4 className="text-sm font-semibold text-gray-900 mb-4">Legal</h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="/privacy" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="/terms" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+                  Terms of Service
+                </a>
+              </li>
+            </ul>
+            <p className="text-sm text-gray-600 mt-4">
               We curate Korean local trends and translate them for global audiences.
             </p>
           </div>

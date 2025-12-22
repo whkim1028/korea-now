@@ -18,8 +18,12 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-  title: "KoreaNow - Discover What's Trending in Korea",
+  title: {
+    default: "KoreaNow - Discover What's Trending in Korea",
+    template: '%s | KoreaNow',
+  },
   description: "Experience Korean culture, food, and trends as they happen. Curated local insights for global audiences.",
+  keywords: ['Korea', 'Korean food', 'Korean culture', 'restaurants', 'travel Korea', 'mukbang', 'Korean trends'],
 };
 
 export default function RootLayout({

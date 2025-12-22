@@ -27,9 +27,26 @@ export async function generateMetadata({ params }: EditorialPageProps): Promise<
   }
 
   return {
-    title: `${editorial.title_translated} - KoreaNow`,
+    title: `${editorial.title_translated}`,
     description: editorial.summary_short || editorial.summary_translated,
     openGraph: {
+      type: 'article',
+      title: editorial.title_translated,
+      description: editorial.summary_short || editorial.summary_translated || '',
+      url: `https://koreanow.pages.dev/editorials/${id}`,
+      siteName: 'KoreaNow',
+      locale: 'en_US',
+      images: editorial.image_url ? [{
+        url: editorial.image_url,
+        width: 1200,
+        height: 630,
+        alt: editorial.title_translated,
+      }] : [],
+      publishedTime: editorial.created_at,
+      modifiedTime: editorial.updated_at || editorial.created_at,
+    },
+    twitter: {
+      card: 'summary_large_image',
       title: editorial.title_translated,
       description: editorial.summary_short || editorial.summary_translated || '',
       images: editorial.image_url ? [editorial.image_url] : [],
@@ -52,8 +69,41 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
     ...(editorial.content?.glossary || {}),
   };
 
+  // Generate Schema.org JSON-LD for Article
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: editorial.title_translated,
+    description: editorial.summary_short || editorial.summary_translated || '',
+    image: editorial.image_url ? [editorial.image_url] : undefined,
+    datePublished: editorial.created_at,
+    dateModified: editorial.updated_at || editorial.created_at,
+    author: {
+      '@type': 'Organization',
+      name: 'KoreaNow',
+      url: 'https://koreanow.pages.dev',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'KoreaNow',
+      url: 'https://koreanow.pages.dev',
+    },
+    url: `https://koreanow.pages.dev/editorials/${id}`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `https://koreanow.pages.dev/editorials/${id}`,
+    },
+    articleBody: editorial.content?.content_translated || editorial.summary_translated,
+    keywords: editorial.summary_bullets ? editorial.summary_bullets.join(', ') : 'Korean food, Korean culture, Korea',
+  };
+
   return (
     <article className="min-h-screen bg-white">
+      {/* Schema.org JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Header */}
       <div className="border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -100,6 +150,7 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
           <ArticleContent
             content={editorial.content.content_translated}
             images={editorial.content.images}
+            glossary={combinedGlossary}
           />
         )}
 
