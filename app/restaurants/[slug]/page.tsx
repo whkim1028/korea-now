@@ -182,7 +182,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
               {restaurant.detail?.summary_short && (
                 <p className="text-xl text-white/90 mb-4 drop-shadow-md max-w-2xl">
                   <TextWithGlossary
-                    text={restaurant.detail.summary_short}
+                    text={String(restaurant.detail.summary_short)}
                     glossary={combinedGlossary}
                   />
                 </p>
@@ -242,9 +242,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
           <div className="mb-12">
             <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
               <TextWithGlossary
-                text={typeof restaurant.detail.description_translated === 'string'
-                  ? restaurant.detail.description_translated
-                  : String(restaurant.detail.description_translated)}
+                text={String(restaurant.detail.description_translated)}
                 glossary={combinedGlossary}
               />
             </div>
@@ -295,7 +293,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
                   >
                     <span className="text-gray-800 flex-1 leading-relaxed group-hover:text-gray-900">
                       <TextWithGlossary
-                        text={item.name}
+                        text={String(item.name)}
                         glossary={combinedGlossary}
                       />
                     </span>
@@ -310,9 +308,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
             ) : (
               <div className="prose prose-lg max-w-none text-gray-800 leading-relaxed">
                 <TextWithGlossary
-                  text={typeof (restaurant.detail?.menus_translated || restaurant.menu) === 'string'
-                    ? (restaurant.detail?.menus_translated || restaurant.menu)
-                    : String(restaurant.detail?.menus_translated || restaurant.menu || '')}
+                  text={String(restaurant.detail?.menus_translated || restaurant.menu || '')}
                   glossary={combinedGlossary}
                 />
               </div>
@@ -371,9 +367,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
                   </dt>
                   <dd className="text-gray-700">
                     <TextWithGlossary
-                      text={typeof restaurant.detail.operating_hours_translated === 'string'
-                        ? restaurant.detail.operating_hours_translated
-                        : String(restaurant.detail.operating_hours_translated)}
+                      text={String(restaurant.detail.operating_hours_translated)}
                       glossary={combinedGlossary}
                     />
                   </dd>
@@ -415,9 +409,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
                   </dt>
                   <dd className="text-gray-700">
                     <TextWithGlossary
-                      text={typeof restaurant.detail.facilities_translated === 'string'
-                        ? restaurant.detail.facilities_translated
-                        : String(restaurant.detail.facilities_translated)}
+                      text={String(restaurant.detail.facilities_translated)}
                       glossary={combinedGlossary}
                     />
                   </dd>
