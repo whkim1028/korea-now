@@ -12,15 +12,15 @@ export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
 interface RestaurantPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: RestaurantPageProps): Promise<Metadata> {
-  const id = params.slug;
-  const restaurant = await getFullRestaurantById(id);
+  const { slug } = await params;
+  const restaurant = await getFullRestaurantById(slug);
 
   if (!restaurant) {
     return {
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: RestaurantPageProps): Promise
       type: 'website',
       title: restaurant.name,
       description: restaurant.summary_short || `Discover ${restaurant.name} in Korea`,
-      url: `https://koreanow.pages.dev/restaurants/${id}`,
+      url: `https://koreanow.pages.dev/restaurants/${slug}`,
       siteName: 'KoreaNow',
       locale: 'en_US',
       images: imageUrl ? [{
@@ -57,8 +57,8 @@ export async function generateMetadata({ params }: RestaurantPageProps): Promise
 }
 
 export default async function RestaurantPage({ params }: RestaurantPageProps) {
-  const id = params.slug;
-  const restaurant = await getFullRestaurantById(id);
+  const { slug } = await params;
+  const restaurant = await getFullRestaurantById(slug);
 
   if (!restaurant) {
     notFound();
@@ -158,7 +158,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
       latitude: restaurant.detail.geo_w,
       longitude: restaurant.detail.geo_g,
     } : undefined,
-    url: `https://koreanow.pages.dev/restaurants/${id}`,
+    url: `https://koreanow.pages.dev/restaurants/${slug}`,
     servesCuisine: 'Korean',
   };
 

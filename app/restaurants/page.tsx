@@ -1,4 +1,4 @@
-import { getRestaurants, getRegions } from "@/lib/data/restaurants";
+import { getRestaurants, getRegions, getRegionDetails } from "@/lib/data/restaurants";
 import RestaurantCard from "@/components/RestaurantCard";
 import RegionFilter from "@/components/RegionFilter";
 import Link from "next/link";
@@ -15,15 +15,17 @@ export const metadata: Metadata = {
 export default async function RestaurantsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ region?: string; region_detail?: string }>;
+  searchParams: Promise<{ region?: string; region_detail?: string; region_detail_name?: string }>;
 }) {
   const params = await searchParams;
   const selectedRegion = params.region;
   const selectedRegionDetail = params.region_detail;
+  const selectedRegionDetailName = params.region_detail_name;
 
-  const [restaurants, regions] = await Promise.all([
-    getRestaurants(undefined, selectedRegion, selectedRegionDetail),
+  const [restaurants, regions, regionDetails] = await Promise.all([
+    getRestaurants(undefined, selectedRegion, selectedRegionDetail, selectedRegionDetailName),
     getRegions(),
+    selectedRegion ? getRegionDetails(selectedRegion) : Promise.resolve([]),
   ]);
 
   return (
@@ -44,7 +46,12 @@ export default async function RestaurantsPage({
       {/* Sticky Filter Bar */}
       <div className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
-          <RegionFilter regions={regions} currentRegion={selectedRegion} />
+          <RegionFilter
+            regions={regions}
+            currentRegion={selectedRegion}
+            regionDetails={regionDetails}
+            currentRegionDetail={selectedRegionDetailName}
+          />
         </div>
       </div>
 
@@ -70,7 +77,7 @@ export default async function RestaurantsPage({
                       {selectedRegion.charAt(0) +
                         selectedRegion.slice(1).toLowerCase()}
                       {selectedRegion === "SEOUL" && " (Gangnam + Gangbuk)"}
-                      {selectedRegionDetail && ` · ${selectedRegionDetail}`}
+                      {selectedRegionDetailName && ` · ${selectedRegionDetailName}`}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 flex items-center gap-1">

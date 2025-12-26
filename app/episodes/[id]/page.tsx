@@ -42,7 +42,7 @@ export default async function EpisodePage({ params }: EpisodePageProps) {
 
   const regionCode = REGION_NAME_TO_CODE[episode.region_name] || episode.region_name.toUpperCase();
   const regionDisplay = REGION_NAME_TO_DISPLAY[episode.region_name] || episode.region_name;
-  const restaurantLink = `/restaurants?region=${regionCode}&region_detail=${episode.region_detail}`;
+  const restaurantLink = `/restaurants?region=${regionCode}&region_detail_name=${episode.region_detail_name_eng}`;
 
   return (
     <article className="min-h-screen bg-white">

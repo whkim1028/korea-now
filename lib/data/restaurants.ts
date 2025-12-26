@@ -7,8 +7,9 @@ import type { RestaurantTranslation, RestaurantDetailTranslation, RestaurantDeta
  * Fetches category_translated from popular_restaurants_detail_translations
  * Supports region filtering with Seoul grouping (Gangnam + Gangbuk)
  * Supports region_detail filtering for Black White Chef episodes
+ * Supports region_detail_name filtering for detailed regional filtering
  */
-export async function getRestaurants(limit?: number, region?: string, regionDetail?: string): Promise<RestaurantTranslation[]> {
+export async function getRestaurants(limit?: number, region?: string, regionDetail?: string, regionDetailName?: string): Promise<RestaurantTranslation[]> {
   let query = supabase
     .from('popular_restaurants_localizations')
     .select(`
@@ -31,9 +32,14 @@ export async function getRestaurants(limit?: number, region?: string, regionDeta
     }
   }
 
-  // Apply region_detail filter (for Black White Chef episodes)
+  // Apply region_detail filter (for Black White Chef episodes - uses numeric code)
   if (regionDetail) {
     query = query.eq('region_detail', regionDetail);
+  }
+
+  // Apply region_detail_name filter (for detailed regional filtering - uses name)
+  if (regionDetailName) {
+    query = query.eq('region_detail_name', regionDetailName);
   }
 
   // Apply limit
@@ -271,6 +277,49 @@ export async function getFullRestaurant(site: string, url: string): Promise<Rest
     detail: detail ?? undefined,
     detailRaw: detailRaw ?? undefined,
   };
+}
+
+/**
+ * Get unique region_detail_name values for a specific region
+ * Returns sorted list of detail region names (e.g., "Jindo", "Wando", "Yeosu" for Jeonnam)
+ */
+export async function getRegionDetails(region: string): Promise<string[]> {
+  if (!region) return [];
+
+  const regionUpper = region.toUpperCase();
+
+  // Build query based on region
+  let query = supabase
+    .from('popular_restaurants_localizations')
+    .select('region_detail_name')
+    .eq('lang', 'en')
+    .not('region_detail_name', 'is', null);
+
+  if (regionUpper === 'SEOUL') {
+    // Seoul includes both Gangnam and Gangbuk
+    query = query.or('region_name.ilike.GANGNAM%,region_name.ilike.GANGBUK%');
+  } else {
+    // Match specific region code
+    query = query.ilike('region_name', `${regionUpper}%`);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching region details:', error);
+    return [];
+  }
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  // Get unique region_detail_name values and sort
+  const uniqueDetails = Array.from(
+    new Set(data.map((item: any) => item.region_detail_name).filter(Boolean))
+  ).sort();
+
+  return uniqueDetails;
 }
 
 /**
