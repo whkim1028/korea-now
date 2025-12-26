@@ -15,10 +15,7 @@ export default function RegionFilter({ regions, currentRegion, regionDetails = [
   const searchParams = useSearchParams();
   const scrollRef = useRef<HTMLDivElement>(null);
   const detailScrollRef = useRef<HTMLDivElement>(null);
-  const [showLeftShadow, setShowLeftShadow] = useState(false);
-  const [showRightShadow, setShowRightShadow] = useState(false);
-  const [showDetailLeftShadow, setShowDetailLeftShadow] = useState(false);
-  const [showDetailRightShadow, setShowDetailRightShadow] = useState(false);
+  const [showDetailFilter, setShowDetailFilter] = useState(true);
 
   const handleRegionSelect = (region: string) => {
     // Update URL with region parameter
@@ -53,213 +50,106 @@ export default function RegionFilter({ regions, currentRegion, regionDetails = [
     return region.charAt(0) + region.slice(1).toLowerCase();
   };
 
-  const checkScroll = () => {
-    const element = scrollRef.current;
-    if (!element) return;
-
-    setShowLeftShadow(element.scrollLeft > 10);
-    setShowRightShadow(
-      element.scrollLeft < element.scrollWidth - element.clientWidth - 10
-    );
-  };
-
-  const checkDetailScroll = () => {
-    const element = detailScrollRef.current;
-    if (!element) return;
-
-    setShowDetailLeftShadow(element.scrollLeft > 10);
-    setShowDetailRightShadow(
-      element.scrollLeft < element.scrollWidth - element.clientWidth - 10
-    );
-  };
-
-  useEffect(() => {
-    checkScroll();
-    checkDetailScroll();
-    window.addEventListener('resize', checkScroll);
-    window.addEventListener('resize', checkDetailScroll);
-    return () => {
-      window.removeEventListener('resize', checkScroll);
-      window.removeEventListener('resize', checkDetailScroll);
-    };
-  }, [regionDetails]);
-
   return (
     <div className="w-full">
-      {/* Filter Label with active indicator */}
-      <div className="mb-5 md:mb-6 flex items-center gap-3">
-        <h2 className="text-base md:text-lg font-semibold text-gray-900">
-          Filter by Region
-        </h2>
-        {currentRegion && (
-          <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full">
-            <div className="h-2 w-2 rounded-full bg-gray-900 animate-pulse" />
-            <span className="text-xs font-medium text-gray-700">Active</span>
+      {/* Compact Filter Layout */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8">
+        {/* Region Filter */}
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Region</span>
+            {currentRegion && (
+              <div className="h-1.5 w-1.5 rounded-full bg-gray-900" />
+            )}
           </div>
-        )}
-      </div>
-
-      {/* Horizontal Scrollable Filter with Shadows */}
-      <div className="relative -mx-4 sm:mx-0">
-        {/* Left Shadow - PC only */}
-        {showLeftShadow && (
-          <div className="hidden sm:block absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-        )}
-
-        {/* Right Shadow - PC only */}
-        {showRightShadow && (
-          <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-        )}
-
-        {/* Scrollable Container */}
-        <div
-          ref={scrollRef}
-          onScroll={checkScroll}
-          className="flex gap-3 overflow-x-auto scrollbar-hide py-3 pb-5 px-4 sm:px-0"
-          style={{
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            WebkitOverflowScrolling: 'touch',
-          }}
-        >
-          {/* All Regions */}
-          <button
-            onClick={() => handleRegionSelect('')}
-            className={`flex-shrink-0 px-6 py-3 md:px-7 md:py-3.5 rounded-full text-sm md:text-base font-semibold transition-all duration-200 touch-manipulation ${
-              !currentRegion
-                ? 'bg-gray-900 text-white shadow-xl ring-[3px] ring-gray-400'
-                : 'bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100'
-            }`}
+          <div
+            ref={scrollRef}
+            className="flex gap-2 overflow-x-auto lg:overflow-visible lg:flex-wrap scrollbar-hide"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch',
+            }}
           >
-            <span className="flex items-center gap-2">
-              {!currentRegion && (
-                <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-              All Regions
-            </span>
-          </button>
+            <button
+              onClick={() => handleRegionSelect('')}
+              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium transition-all ${
+                !currentRegion
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All
+            </button>
+            {regions.map((region) => {
+              const isSelected = currentRegion === region;
+              const displayName = formatRegionName(region);
 
-          {/* Individual Regions */}
-          {regions.map((region) => {
-            const isSelected = currentRegion === region;
-            const displayName = formatRegionName(region);
-
-            return (
-              <button
-                key={region}
-                onClick={() => handleRegionSelect(region)}
-                className={`flex-shrink-0 px-6 py-3 md:px-7 md:py-3.5 rounded-full text-sm md:text-base font-semibold transition-all duration-200 touch-manipulation ${
-                  isSelected
-                    ? 'bg-gray-900 text-white shadow-xl ring-[3px] ring-gray-400'
-                    : 'bg-white text-gray-700 border-2 border-gray-300 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100'
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  {isSelected && (
-                    <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
+              return (
+                <button
+                  key={region}
+                  onClick={() => handleRegionSelect(region)}
+                  className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
+                    isSelected
+                      ? 'bg-gray-900 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {displayName}
+                  {region === 'SEOUL' && (
+                    <span className={`ml-1 ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>
+                      (GN+GB)
+                    </span>
                   )}
-                  <span className="whitespace-nowrap">
-                    {displayName}
-                    {region === 'SEOUL' && (
-                      <span className={`ml-1.5 text-xs ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>
-                        (Gangnam + Gangbuk)
-                      </span>
-                    )}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Mobile Scroll Hint */}
-      {showRightShadow && (
-        <div className="mt-4 sm:hidden">
-          <p className="text-xs text-gray-500 flex items-center gap-1.5 px-4 sm:px-0">
-            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-            <span>Swipe to see more regions</span>
-          </p>
-        </div>
-      )}
-
-      {/* Second Level Filter: Region Details */}
-      {currentRegion && regionDetails.length > 0 && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          {/* Detail Filter Label */}
-          <div className="mb-5 md:mb-6 flex items-center gap-3">
-            <h3 className="text-sm md:text-base font-semibold text-gray-700">
-              Filter by Detailed Area
-            </h3>
-            {currentRegionDetail && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full">
-                <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
-                <span className="text-xs font-medium text-blue-700">Active</span>
-              </div>
-            )}
+                </button>
+              );
+            })}
           </div>
+        </div>
 
-          {/* Horizontal Scrollable Detail Filter */}
-          <div className="relative -mx-4 sm:mx-0">
-            {/* Left Shadow */}
-            {showDetailLeftShadow && (
-              <div className="hidden sm:block absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
-            )}
-
-            {/* Right Shadow */}
-            {showDetailRightShadow && (
-              <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
-            )}
-
-            {/* Scrollable Container */}
+        {/* Detail Filter - Collapsible */}
+        {currentRegion && regionDetails.length > 0 && (
+          <div className="flex-1 mt-4 lg:mt-0 lg:pl-8 lg:border-l border-gray-200">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Detailed Area</span>
+              {currentRegionDetail && (
+                <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+              )}
+              <button
+                onClick={() => setShowDetailFilter(!showDetailFilter)}
+                className="ml-auto lg:hidden p-1 hover:bg-gray-100 rounded"
+              >
+                <svg
+                  className={`w-4 h-4 text-gray-500 transition-transform ${showDetailFilter ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
             <div
               ref={detailScrollRef}
-              onScroll={checkDetailScroll}
-              className="flex gap-2 overflow-x-auto scrollbar-hide py-2 pb-4 px-4 sm:px-0"
+              className={`flex gap-2 overflow-x-auto lg:overflow-visible lg:flex-wrap scrollbar-hide transition-all ${
+                showDetailFilter ? 'max-h-20 lg:max-h-40 opacity-100' : 'max-h-0 opacity-0 lg:max-h-40 lg:opacity-100'
+              }`}
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
                 WebkitOverflowScrolling: 'touch',
               }}
             >
-              {/* All Details (Clear filter) */}
               <button
                 onClick={() => handleRegionDetailSelect('')}
-                className={`flex-shrink-0 px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-200 touch-manipulation ${
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   !currentRegionDetail
-                    ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                    : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
                 }`}
               >
-                <span className="flex items-center gap-1.5">
-                  {!currentRegionDetail && (
-                    <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                  All Areas
-                </span>
+                All
               </button>
-
-              {/* Individual Detail Regions */}
               {regionDetails.map((detail) => {
                 const isSelected = currentRegionDetail === detail;
 
@@ -267,43 +157,20 @@ export default function RegionFilter({ regions, currentRegion, regionDetails = [
                   <button
                     key={detail}
                     onClick={() => handleRegionDetailSelect(detail)}
-                    className={`flex-shrink-0 px-5 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-200 touch-manipulation ${
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                       isSelected
-                        ? 'bg-blue-600 text-white shadow-lg ring-2 ring-blue-300'
-                        : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
                     }`}
                   >
-                    <span className="flex items-center gap-1.5 whitespace-nowrap">
-                      {isSelected && (
-                        <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path
-                            fillRule="evenodd"
-                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      )}
-                      {detail}
-                    </span>
+                    {detail}
                   </button>
                 );
               })}
             </div>
           </div>
-
-          {/* Mobile Scroll Hint for Details */}
-          {showDetailRightShadow && (
-            <div className="mt-3 sm:hidden">
-              <p className="text-xs text-gray-500 flex items-center gap-1.5 px-4 sm:px-0">
-                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-                <span>Swipe to see more areas</span>
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
