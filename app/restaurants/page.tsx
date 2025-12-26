@@ -15,13 +15,14 @@ export const metadata: Metadata = {
 export default async function RestaurantsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ region?: string }>;
+  searchParams: Promise<{ region?: string; region_detail?: string }>;
 }) {
   const params = await searchParams;
   const selectedRegion = params.region;
+  const selectedRegionDetail = params.region_detail;
 
   const [restaurants, regions] = await Promise.all([
-    getRestaurants(undefined, selectedRegion),
+    getRestaurants(undefined, selectedRegion, selectedRegionDetail),
     getRegions(),
   ]);
 
@@ -69,6 +70,7 @@ export default async function RestaurantsPage({
                       {selectedRegion.charAt(0) +
                         selectedRegion.slice(1).toLowerCase()}
                       {selectedRegion === "SEOUL" && " (Gangnam + Gangbuk)"}
+                      {selectedRegionDetail && ` · ${selectedRegionDetail}`}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500 flex items-center gap-1">
@@ -83,7 +85,7 @@ export default async function RestaurantsPage({
                         clipRule="evenodd"
                       />
                     </svg>
-                    Filter applied — showing region-specific results
+                    Filter applied — showing {selectedRegionDetail ? 'regional detail' : 'region-specific'} results
                   </p>
                 </div>
               ) : (

@@ -1,9 +1,11 @@
 import { getFeaturedEditorials } from "@/lib/data/editorials";
 import { getRestaurants, getRegions } from "@/lib/data/restaurants";
 import { getFeaturedYouTubeVideos } from "@/lib/data/youtube";
+import { getFeaturedBlackWhiteChefEpisodes } from "@/lib/data/blackWhiteChef";
 import EditorialCard from "@/components/EditorialCard";
 import RestaurantCard from "@/components/RestaurantCard";
 import YouTubeCard from "@/components/YouTubeCard";
+import BlackWhiteChefSection from "@/components/BlackWhiteChefSection";
 import RegionFilter from "@/components/RegionFilter";
 import RegionExplorer from "@/components/RegionExplorer";
 import Link from "next/link";
@@ -18,12 +20,13 @@ export default async function Home({
   const params = await searchParams;
   const selectedRegion = params.region;
 
-  const [featuredEditorials, trendingRestaurants, regions, featuredVideos] =
+  const [featuredEditorials, trendingRestaurants, regions, featuredVideos, blackWhiteChefEpisodes] =
     await Promise.all([
       getFeaturedEditorials(2),
       getRestaurants(9, selectedRegion),
       getRegions(),
       getFeaturedYouTubeVideos(5),
+      getFeaturedBlackWhiteChefEpisodes(4),
     ]);
 
   return (
@@ -41,6 +44,9 @@ export default async function Home({
           </div>
         </div>
       </section>
+
+      {/* Black White Chef Special Section */}
+      <BlackWhiteChefSection episodes={blackWhiteChefEpisodes} />
 
       {/* Explore by Region - CTA Section */}
       <section className="bg-white border-b border-gray-200">
