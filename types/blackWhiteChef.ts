@@ -1,4 +1,4 @@
-// Black White Chef Episode Type (from DB)
+// Culinary Class Wars Episode Type (from DB)
 export interface BlackWhiteChefEpisode {
   id: number;
   season: number;

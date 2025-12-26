@@ -6,9 +6,9 @@ import type { Metadata } from 'next';
 export const runtime = 'edge';
 
 export const metadata: Metadata = {
-  title: 'Black White Chef Episodes - KoreaNow',
+  title: 'Culinary Class Wars Episodes - KoreaNow',
   description:
-    'Explore all regional food battles from Black White Chef Season 2. Discover the stories behind each episode and find authentic restaurants in those regions.',
+    'Explore all regional food battles from Culinary Class Wars Season 2. Discover the stories behind each episode and find authentic restaurants in those regions.',
 };
 
 export default async function EpisodesPage() {
@@ -53,7 +53,7 @@ export default async function EpisodesPage() {
               </span>
             </div>
             <h1 className="text-5xl md:text-6xl font-serif font-bold text-gray-900 leading-tight mb-4">
-              Black White Chef Episodes
+              Culinary Class Wars Episodes
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 max-w-3xl leading-relaxed">
               Regional food battles featuring Korea&apos;s finest ingredients and culinary traditions. Each episode showcases a different region&apos;s specialty.

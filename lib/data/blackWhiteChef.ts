@@ -114,7 +114,7 @@ function transformToCard(episode: BlackWhiteChefEpisode): BlackWhiteChefCard {
 }
 
 /**
- * Get all active Black White Chef episodes
+ * Get all active Culinary Class Wars episodes
  */
 export async function getBlackWhiteChefEpisodes(): Promise<BlackWhiteChefCard[]> {
   try {
@@ -126,7 +126,7 @@ export async function getBlackWhiteChefEpisodes(): Promise<BlackWhiteChefCard[]>
       .order('id', { ascending: true });
 
     if (error) {
-      console.error('Error fetching Black White Chef episodes:', error);
+      console.error('Error fetching Culinary Class Wars episodes:', error);
       return [];
     }
 
@@ -163,7 +163,7 @@ export async function getBlackWhiteChefEpisodeById(id: string): Promise<BlackWhi
       .single();
 
     if (error) {
-      console.error('Error fetching Black White Chef episode:', error);
+      console.error('Error fetching Culinary Class Wars episode:', error);
       return null;
     }
 

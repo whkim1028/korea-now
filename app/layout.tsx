@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     'Culinary Class Wars',
     'Culinary Class Wars Netflix',
     'Foods from Culinary Class Wars',
-    'Black White Chef',
+    'Culinary Class Wars restaurants',
     'Korean food culture',
     'Korean restaurants by region',
     'Authentic Korean food',

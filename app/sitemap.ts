@@ -11,7 +11,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Use fewer items in development for faster page loads
   const isDev = process.env.NODE_ENV === 'development';
-  const itemLimit = isDev ? 10 : 100;
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -67,7 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   try {
     // Dynamic editorial pages
-    const editorials = await getEditorials(itemLimit);
+    const editorials = await getEditorials(isDev ? 10 : undefined);
     const editorialPages: MetadataRoute.Sitemap = editorials.map((editorial) => ({
       url: `${baseUrl}/editorials/${editorial.id}`,
       lastModified: editorial.created_at ? new Date(editorial.created_at) : new Date(),
@@ -76,7 +75,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // Dynamic restaurant pages
-    const restaurants = await getRestaurants(itemLimit);
+    const restaurants = await getRestaurants(isDev ? 10 : undefined);
     const restaurantPages: MetadataRoute.Sitemap = restaurants.map((restaurant) => ({
       url: `${baseUrl}/restaurants/${restaurant.id}`,
       lastModified: restaurant.created_at ? new Date(restaurant.created_at) : new Date(),
@@ -84,7 +83,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    // Dynamic episode pages (Black White Chef)
+    // Dynamic episode pages (Culinary Class Wars)
     const episodes = await getBlackWhiteChefEpisodes();
     const episodePages: MetadataRoute.Sitemap = episodes.map((episode) => ({
       url: `${baseUrl}/episodes/${episode.id}`,

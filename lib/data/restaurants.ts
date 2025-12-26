@@ -6,7 +6,7 @@ import type { RestaurantTranslation, RestaurantDetailTranslation, RestaurantDeta
  * Joins with popular_restaurants to get original images
  * Fetches category_translated from popular_restaurants_detail_translations
  * Supports region filtering with Seoul grouping (Gangnam + Gangbuk)
- * Supports region_detail filtering for Black White Chef episodes
+ * Supports region_detail filtering for Culinary Class Wars episodes
  * Supports region_detail_name filtering for detailed regional filtering
  */
 export async function getRestaurants(limit?: number, region?: string, regionDetail?: string, regionDetailName?: string): Promise<RestaurantTranslation[]> {
@@ -32,7 +32,7 @@ export async function getRestaurants(limit?: number, region?: string, regionDeta
     }
   }
 
-  // Apply region_detail filter (for Black White Chef episodes - uses numeric code)
+  // Apply region_detail filter (for Culinary Class Wars episodes - uses numeric code)
   if (regionDetail) {
     query = query.eq('region_detail', regionDetail);
   }

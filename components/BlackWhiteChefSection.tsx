@@ -24,7 +24,7 @@ export default function BlackWhiteChefSection({ episodes }: BlackWhiteChefSectio
             <div className="relative h-[500px] lg:h-full rounded-2xl overflow-hidden shadow-2xl bg-gray-900">
               <Image
                 src="/black_white_chef/main_poster.gif"
-                alt="Black White Chef - Season 2"
+                alt="Culinary Class Wars - Season 2"
                 fill
                 className="object-contain"
                 priority
@@ -60,8 +60,8 @@ export default function BlackWhiteChefSection({ episodes }: BlackWhiteChefSectio
 
               {/* Context */}
               <p className="text-sm text-gray-500 italic">
-                흑백요리사: 요리 계급 전쟁<br />
-                <span className="text-xs not-italic">(Black White Chef: The Culinary Class Wars)</span>
+                Culinary Class Wars<br />
+                <span className="text-xs not-italic">(흑백요리사: 요리 계급 전쟁)</span>
               </p>
             </div>
 
