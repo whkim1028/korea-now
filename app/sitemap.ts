@@ -1,12 +1,13 @@
 import { MetadataRoute } from 'next';
 import { getEditorials } from '@/lib/data/editorials';
 import { getRestaurants } from '@/lib/data/restaurants';
+import { getBlackWhiteChefEpisodes } from '@/lib/data/blackWhiteChef';
 
 // Revalidate every hour (3600 seconds)
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://koreanow.pages.dev';
+  const baseUrl = 'https://koreanow.app';
 
   // Use fewer items in development for faster page loads
   const isDev = process.env.NODE_ENV === 'development';
@@ -37,6 +38,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'hourly',
       priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/episodes`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/glossary`,
@@ -77,7 +84,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    return [...staticPages, ...editorialPages, ...restaurantPages];
+    // Dynamic episode pages (Black White Chef)
+    const episodes = await getBlackWhiteChefEpisodes();
+    const episodePages: MetadataRoute.Sitemap = episodes.map((episode) => ({
+      url: `${baseUrl}/episodes/${episode.id}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.85,
+    }));
+
+    return [...staticPages, ...editorialPages, ...restaurantPages, ...episodePages];
   } catch (error) {
     console.error('Error generating sitemap:', error);
     // Return static pages only if data fetching fails
