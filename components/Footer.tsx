@@ -53,9 +53,15 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-sm text-gray-500 text-center">
-            © {new Date().getFullYear()} KoreaNow. All rights reserved.
-          </p>
+          <div className="text-center space-y-2">
+            <p className="text-xs text-gray-500">
+              Information curated from publicly available sources in Korea.
+              All content translated for international travelers.
+            </p>
+            <p className="text-sm text-gray-500">
+              © {new Date().getFullYear()} KoreaNow. All rights reserved.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

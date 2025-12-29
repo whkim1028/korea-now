@@ -428,20 +428,6 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
           (!Array.isArray(combinedGlossary) && Object.keys(combinedGlossary).length > 0)) && (
           <GlossarySection glossary={combinedGlossary} />
         )}
-
-        {/* Source Link */}
-        {sourceUrl && (
-          <div className="mt-12 pt-8 border-t border-gray-200">
-            <a
-              href={sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              View Original Source →
-            </a>
-          </div>
-        )}
       </div>
     </article>
   );
