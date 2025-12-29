@@ -9,8 +9,15 @@ import BlackWhiteChefSection from "@/components/BlackWhiteChefSection";
 import RegionFilter from "@/components/RegionFilter";
 import RegionExplorer from "@/components/RegionExplorer";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 export const runtime = "edge";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://koreanow.app',
+  },
+};
 
 export default async function Home({
   searchParams,

@@ -33,11 +33,14 @@ export async function generateMetadata({ params }: RestaurantPageProps): Promise
   return {
     title: `${restaurant.name}`,
     description: restaurant.summary_short || `Discover ${restaurant.name} in Korea`,
+    alternates: {
+      canonical: `https://koreanow.app/restaurants/${slug}`,
+    },
     openGraph: {
       type: 'website',
       title: restaurant.name,
       description: restaurant.summary_short || `Discover ${restaurant.name} in Korea`,
-      url: `https://koreanow.pages.dev/restaurants/${slug}`,
+      url: `https://koreanow.app/restaurants/${slug}`,
       siteName: 'KoreaNow',
       locale: 'en_US',
       images: imageUrl ? [{
@@ -158,7 +161,7 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
       latitude: restaurant.detail.geo_w,
       longitude: restaurant.detail.geo_g,
     } : undefined,
-    url: `https://koreanow.pages.dev/restaurants/${slug}`,
+    url: `https://koreanow.app/restaurants/${slug}`,
     servesCuisine: 'Korean',
   };
 

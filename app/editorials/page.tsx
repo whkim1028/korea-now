@@ -7,6 +7,9 @@ export const runtime = 'edge';
 export const metadata: Metadata = {
   title: 'Editorial - KoreaNow',
   description: 'Discover curated stories about Korean culture, food, and trends.',
+  alternates: {
+    canonical: 'https://koreanow.app/editorials',
+  },
 };
 
 export default async function EditorialsPage() {

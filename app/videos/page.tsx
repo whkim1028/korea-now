@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "Trending Korean Food Videos - KoreaNow",
   description:
     "Watch the most popular Korean food videos. Mukbang, street food, restaurant tours, and more from Korea's top creators.",
+  alternates: {
+    canonical: 'https://koreanow.app/videos',
+  },
 };
 
 export default async function VideosPage() {

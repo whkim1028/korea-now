@@ -67,6 +67,9 @@ export async function generateMetadata({ params }: EpisodePageProps): Promise<Me
     title: `${titleWithChefs} - KoreaNow`,
     description,
     keywords,
+    alternates: {
+      canonical: `https://koreanow.app/episodes/${id}`,
+    },
     openGraph: {
       title: titleWithChefs,
       description,

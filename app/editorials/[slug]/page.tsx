@@ -29,11 +29,14 @@ export async function generateMetadata({ params }: EditorialPageProps): Promise<
   return {
     title: `${editorial.title_translated}`,
     description: editorial.summary_short || editorial.summary_translated,
+    alternates: {
+      canonical: `https://koreanow.app/editorials/${id}`,
+    },
     openGraph: {
       type: 'article',
       title: editorial.title_translated,
       description: editorial.summary_short || editorial.summary_translated || '',
-      url: `https://koreanow.pages.dev/editorials/${id}`,
+      url: `https://koreanow.app/editorials/${id}`,
       siteName: 'KoreaNow',
       locale: 'en_US',
       images: editorial.image_url ? [{
@@ -81,17 +84,17 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
     author: {
       '@type': 'Organization',
       name: 'KoreaNow',
-      url: 'https://koreanow.pages.dev',
+      url: 'https://koreanow.app',
     },
     publisher: {
       '@type': 'Organization',
       name: 'KoreaNow',
-      url: 'https://koreanow.pages.dev',
+      url: 'https://koreanow.app',
     },
-    url: `https://koreanow.pages.dev/editorials/${id}`,
+    url: `https://koreanow.app/editorials/${id}`,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://koreanow.pages.dev/editorials/${id}`,
+      '@id': `https://koreanow.app/editorials/${id}`,
     },
     articleBody: editorial.content?.content_translated || editorial.summary_translated,
     keywords: editorial.summary_bullets ? editorial.summary_bullets.join(', ') : 'Korean food, Korean culture, Korea',

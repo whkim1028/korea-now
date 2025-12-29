@@ -10,6 +10,9 @@ export const metadata: Metadata = {
   title: "Restaurants - KoreaNow",
   description:
     "Discover trending restaurants in Korea. Real local favorites curated for you.",
+  alternates: {
+    canonical: 'https://koreanow.app/restaurants',
+  },
 };
 
 export default async function RestaurantsPage({
