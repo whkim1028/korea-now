@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { RestaurantTranslation, RestaurantDetailTranslation, RestaurantDetail, RestaurantFull } from '@/types/database';
+import { parseRestaurantSlug } from '@/lib/utils/slug';
 
 /**
  * Get all restaurants (for list page)
@@ -135,6 +136,60 @@ export async function getRestaurantById(id: string): Promise<RestaurantTranslati
 }
 
 /**
+ * Get a single restaurant by slug (for detail page with SEO-friendly URLs)
+ * Slug format: {region}-{restaurant-name}
+ * Example: "gangnam-mingles"
+ */
+export async function getRestaurantBySlug(slug: string): Promise<RestaurantTranslation | null> {
+  const { region, name } = parseRestaurantSlug(slug);
+
+  // Query restaurants that match the region and name pattern
+  const { data: restaurants, error } = await supabase
+    .from('popular_restaurants_localizations')
+    .select(`
+      *,
+      popular_restaurants!inner(image_url, url)
+    `)
+    .eq('lang', 'en')
+    .ilike('region_name', `${region.toUpperCase()}%`);
+
+  if (error) {
+    console.error('Error fetching restaurant by slug:', error);
+    return null;
+  }
+
+  if (!restaurants || restaurants.length === 0) {
+    return null;
+  }
+
+  // Find the best match by comparing normalized names
+  const normalizedSearchName = name.toLowerCase().replace(/[^a-z]/g, '');
+
+  const match = restaurants.find((restaurant) => {
+    // Normalize restaurant name: remove parentheses, Korean chars, special chars
+    const normalizedDbName = restaurant.name
+      .replace(/\([^)]*\)/g, '')
+      .replace(/[가-힣]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z]/g, '');
+
+    return normalizedDbName === normalizedSearchName;
+  });
+
+  if (!match) {
+    return null;
+  }
+
+  // Add original image and URL
+  return {
+    ...match,
+    original_image_url: match.popular_restaurants?.image_url,
+    original_url: match.popular_restaurants?.url,
+    popular_restaurants: undefined,
+  };
+}
+
+/**
  * Get a single restaurant by URL (for detail page header) - DEPRECATED
  * Use getRestaurantById instead
  * NOTE: 'site' column may not exist in all schemas
@@ -229,6 +284,40 @@ export async function getRestaurantDetail(url: string): Promise<RestaurantDetail
  */
 export async function getFullRestaurantById(id: string): Promise<RestaurantFull | null> {
   const restaurant = await getRestaurantById(id);
+
+  if (!restaurant) {
+    return null;
+  }
+
+  // Get detail and raw detail if url exists
+  let detail = null;
+  let detailRaw = null;
+
+  const url = restaurant.original_url || restaurant.url;
+
+  if (url) {
+    const site = url.includes('siksin.co.kr') ? 'siksin' : 'unknown';
+
+    [detail, detailRaw] = await Promise.all([
+      getRestaurantDetail(url),
+      getRestaurantDetailRaw(site, url),
+    ]);
+  }
+
+  return {
+    ...restaurant,
+    detail: detail ?? undefined,
+    detailRaw: detailRaw ?? undefined,
+  };
+}
+
+/**
+ * Get full restaurant data by slug (header + detail + raw detail)
+ * Slug format: {region}-{restaurant-name}
+ * Example: "gangnam-mingles"
+ */
+export async function getFullRestaurantBySlug(slug: string): Promise<RestaurantFull | null> {
+  const restaurant = await getRestaurantBySlug(slug);
 
   if (!restaurant) {
     return null;

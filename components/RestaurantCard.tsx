@@ -1,14 +1,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { RestaurantTranslation } from '@/types/database';
+import { generateRestaurantSlug } from '@/lib/utils/slug';
 
 interface RestaurantCardProps {
   restaurant: RestaurantTranslation;
 }
 
 export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
-  // Use restaurant ID as slug
-  const slug = restaurant.id;
+  // Generate SEO-friendly slug: {region}-{restaurant-name}
+  const slug = generateRestaurantSlug(restaurant.name, restaurant.region_name || undefined);
 
   // Use original image from popular_restaurants, fallback to localized image
   const imageUrl = restaurant.original_image_url || restaurant.image_url;

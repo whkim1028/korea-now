@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getFullRestaurantById, getRestaurants } from '@/lib/data/restaurants';
+import { getFullRestaurantBySlug, getRestaurants } from '@/lib/data/restaurants';
+import { generateRestaurantSlug } from '@/lib/utils/slug';
 import GlossarySection from '@/components/GlossarySection';
 import ImageCarousel from '@/components/ImageCarousel';
 import MenuImageGallery from '@/components/MenuImageGallery';
@@ -20,7 +21,7 @@ interface RestaurantPageProps {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: RestaurantPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const restaurant = await getFullRestaurantById(slug);
+  const restaurant = await getFullRestaurantBySlug(slug);
 
   if (!restaurant) {
     return {
@@ -61,7 +62,7 @@ export async function generateMetadata({ params }: RestaurantPageProps): Promise
 
 export default async function RestaurantPage({ params }: RestaurantPageProps) {
   const { slug } = await params;
-  const restaurant = await getFullRestaurantById(slug);
+  const restaurant = await getFullRestaurantBySlug(slug);
 
   if (!restaurant) {
     notFound();
