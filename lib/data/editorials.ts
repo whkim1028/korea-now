@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { EditorialTranslation, EditorialContentTranslation, EditorialFull, RestaurantTranslation } from '@/types/database';
+import { normalizeTitle } from '@/lib/utils/slug';
 
 /**
  * Get all editorials (for list page)
@@ -183,6 +184,45 @@ export async function getFullEditorialById(id: string): Promise<EditorialFull | 
     content,
     restaurants: [],
   };
+}
+
+/**
+ * Get full editorial data by slug (for detail page with SEO-friendly URLs)
+ * Slug format: {title-keywords}
+ * Example: "best-korean-bbq-in-seoul"
+ */
+export async function getFullEditorialBySlug(slug: string): Promise<EditorialFull | null> {
+  // Use getEditorials() which already has proper joins
+  const editorials = await getEditorials();
+
+  if (!editorials || editorials.length === 0) {
+    console.error('No editorials found for slug matching');
+    return null;
+  }
+
+  // Normalize the slug for comparison (convert hyphens to spaces)
+  const normalizedSlug = slug.replace(/-/g, ' ');
+
+  // Find editorial where normalized title matches the slug
+  const match = editorials.find((editorial) => {
+    if (!editorial.title_translated) return false;
+
+    const normalizedDbTitle = normalizeTitle(editorial.title_translated);
+    const normalizedSlugTitle = normalizeTitle(normalizedSlug);
+
+    // Match if the beginning of the title matches the slug (for truncated slugs)
+    return normalizedDbTitle.startsWith(normalizedSlugTitle) ||
+           normalizedSlugTitle.startsWith(normalizedDbTitle) ||
+           normalizedDbTitle === normalizedSlugTitle;
+  });
+
+  if (!match || !match.id) {
+    console.error('No matching editorial found for slug:', slug);
+    return null;
+  }
+
+  // Use the found editorial's ID to get full data
+  return getFullEditorialById(match.id);
 }
 
 /**

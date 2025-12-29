@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { EditorialTranslation } from '@/types/database';
+import { generateEditorialSlug } from '@/lib/utils/slug';
 
 interface EditorialCardProps {
   editorial: EditorialTranslation;
@@ -8,14 +9,14 @@ interface EditorialCardProps {
 }
 
 export default function EditorialCard({ editorial, featured = false }: EditorialCardProps) {
-  // Use id as slug for routing (id is UUID string)
-  const slug = editorial.id || '';
+  // Generate SEO-friendly slug from title
+  const slug = generateEditorialSlug(editorial.title_translated);
 
   // Use original image from food_editorial_posts, fallback to translated image
   const imageUrl = editorial.original_image_url || editorial.image_url;
 
-  // Don't render if no id
-  if (!slug) {
+  // Don't render if no title (needed for slug)
+  if (!editorial.title_translated || !slug) {
     return null;
   }
 

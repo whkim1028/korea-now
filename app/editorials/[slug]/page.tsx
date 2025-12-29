@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getFullEditorialById, getEditorials } from '@/lib/data/editorials';
+import { getFullEditorialBySlug, getEditorials } from '@/lib/data/editorials';
+import { generateEditorialSlug } from '@/lib/utils/slug';
 import GlossarySection from '@/components/GlossarySection';
 import ArticleContent from '@/components/ArticleContent';
 import Image from 'next/image';
@@ -16,9 +17,9 @@ interface EditorialPageProps {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: EditorialPageProps): Promise<Metadata> {
-  const id = params.slug;
+  const slug = params.slug;
 
-  const editorial = await getFullEditorialById(id);
+  const editorial = await getFullEditorialBySlug(slug);
 
   if (!editorial) {
     return {
@@ -30,13 +31,13 @@ export async function generateMetadata({ params }: EditorialPageProps): Promise<
     title: `${editorial.title_translated}`,
     description: editorial.summary_short || editorial.summary_translated,
     alternates: {
-      canonical: `https://koreanow.app/editorials/${id}`,
+      canonical: `https://koreanow.app/editorials/${slug}`,
     },
     openGraph: {
       type: 'article',
       title: editorial.title_translated,
       description: editorial.summary_short || editorial.summary_translated || '',
-      url: `https://koreanow.app/editorials/${id}`,
+      url: `https://koreanow.app/editorials/${slug}`,
       siteName: 'KoreaNow',
       locale: 'en_US',
       images: editorial.image_url ? [{
@@ -58,9 +59,9 @@ export async function generateMetadata({ params }: EditorialPageProps): Promise<
 }
 
 export default async function EditorialPage({ params }: EditorialPageProps) {
-  const id = params.slug;
+  const slug = params.slug;
 
-  const editorial = await getFullEditorialById(id);
+  const editorial = await getFullEditorialBySlug(slug);
 
   if (!editorial) {
     notFound();
@@ -91,10 +92,10 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
       name: 'KoreaNow',
       url: 'https://koreanow.app',
     },
-    url: `https://koreanow.app/editorials/${id}`,
+    url: `https://koreanow.app/editorials/${slug}`,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `https://koreanow.app/editorials/${id}`,
+      '@id': `https://koreanow.app/editorials/${slug}`,
     },
     articleBody: editorial.content?.content_translated || editorial.summary_translated,
     keywords: editorial.summary_bullets ? editorial.summary_bullets.join(', ') : 'Korean food, Korean culture, Korea',

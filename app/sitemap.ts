@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { getEditorials } from '@/lib/data/editorials';
 import { getRestaurants } from '@/lib/data/restaurants';
 import { getBlackWhiteChefEpisodes } from '@/lib/data/blackWhiteChef';
-import { generateRestaurantSlug } from '@/lib/utils/slug';
+import { generateRestaurantSlug, generateEditorialSlug } from '@/lib/utils/slug';
 
 // Revalidate every hour (3600 seconds)
 export const revalidate = 3600;
@@ -68,12 +68,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     // Dynamic editorial pages
     const editorials = await getEditorials(isDev ? 10 : undefined);
-    const editorialPages: MetadataRoute.Sitemap = editorials.map((editorial) => ({
-      url: `${baseUrl}/editorials/${editorial.id}`,
-      lastModified: editorial.created_at ? new Date(editorial.created_at) : new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    }));
+    const editorialPages: MetadataRoute.Sitemap = editorials.map((editorial) => {
+      const slug = generateEditorialSlug(editorial.title_translated);
+      return {
+        url: `${baseUrl}/editorials/${slug}`,
+        lastModified: editorial.created_at ? new Date(editorial.created_at) : new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      };
+    });
 
     // Dynamic restaurant pages
     const restaurants = await getRestaurants(isDev ? 10 : undefined);
