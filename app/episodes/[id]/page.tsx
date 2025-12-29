@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation';
 import { getBlackWhiteChefEpisodeById } from '@/lib/data/blackWhiteChef';
 import { REGION_NAME_TO_CODE, REGION_NAME_TO_DISPLAY } from '@/types/blackWhiteChef';
 import Link from 'next/link';
+import ImageGallery from '@/components/ImageGallery';
+import EpisodeStructuredData from '@/components/EpisodeStructuredData';
 import type { Metadata } from 'next';
 
 export const runtime = 'edge';
@@ -26,9 +28,66 @@ export async function generateMetadata({ params }: EpisodePageProps): Promise<Me
 
   const regionDisplay = REGION_NAME_TO_DISPLAY[episode.region_name] || episode.region_name;
 
+  // Extract ingredient from description (e.g., "Jindo green onion" -> "green onion")
+  const ingredientMatch = episode.episode_desc.match(/(\w+\s+\w+)\s+(match|challenge|battle)/i);
+  const ingredient = ingredientMatch ? ingredientMatch[1] : '';
+
+  // Build enhanced title with chef names
+  const titleWithChefs = episode.related_chef
+    ? `${episode.region_detail_name_eng} ${ingredient} Battle: ${episode.related_chef}`
+    : `${episode.region_detail_name_eng} ${ingredient} Battle`;
+
+  // Enhanced description
+  const description = `Watch ${episode.related_chef || 'top chefs'} compete in a ${regionDisplay} regional food battle featuring ${episode.region_detail_name_eng}'s ${ingredient}. Discover authentic Korean restaurants and local specialties from Culinary Class Wars.`;
+
+  // Parse individual chef names for better SEO
+  const chefNames = episode.related_chef
+    ? episode.related_chef.split(/\s+vs\s+/i).map(name => name.trim())
+    : [];
+
+  // Keywords for SEO
+  const keywords = [
+    ...chefNames,  // Individual chef names
+    episode.related_chef || '',  // Full chef string (e.g., "Chef A vs Chef B")
+    episode.region_detail_name_eng,
+    regionDisplay,
+    ingredient,
+    'Culinary Class Wars',
+    '흑백요리사',
+    'Korean food',
+    'Korean restaurants',
+    'Korean cuisine',
+  ].filter(Boolean).join(', ');
+
+  // Image URL for social sharing (try webp first, fallback handled by client)
+  const imageUrl = `/black_white_chef/${episode.region_detail_name_eng}/1.webp`;
+  const siteUrl = 'https://koreanow.app';
+
   return {
-    title: `${episode.region_detail_name_eng} · Episode ${episode.episode} - KoreaNow`,
-    description: episode.episode_desc.substring(0, 150) + '...',
+    title: `${titleWithChefs} - KoreaNow`,
+    description,
+    keywords,
+    openGraph: {
+      title: titleWithChefs,
+      description,
+      type: 'article',
+      images: [
+        {
+          url: `${siteUrl}${imageUrl}`,
+          width: 1200,
+          height: 630,
+          alt: `${episode.region_detail_name_eng} ${ingredient} battle scene`,
+        },
+      ],
+      locale: 'en_US',
+      siteName: 'KoreaNow',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: titleWithChefs,
+      description,
+      images: [`${siteUrl}${imageUrl}`],
+    },
   };
 }
 
@@ -46,6 +105,9 @@ export default async function EpisodePage({ params }: EpisodePageProps) {
 
   return (
     <article className="min-h-screen bg-white">
+      {/* SEO: Structured Data (JSON-LD) */}
+      <EpisodeStructuredData episode={episode} regionDisplay={regionDisplay} />
+
       {/* Hero Section with Image Placeholder */}
       <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
@@ -71,32 +133,12 @@ export default async function EpisodePage({ params }: EpisodePageProps) {
             </span>
           </div>
 
-          {/* Image Gallery Placeholder */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="aspect-[4/3] bg-white/50 backdrop-blur-sm rounded-lg border-2 border-gray-300 flex items-center justify-center"
-              >
-                <div className="text-center text-gray-400">
-                  <svg
-                    className="w-12 h-12 mx-auto mb-2 opacity-50"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <p className="text-xs font-medium">Battle Image {i}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {/* Image Gallery */}
+          <ImageGallery
+            regionName={episode.region_detail_name_eng}
+            imageCount={3}
+            chefNames={episode.related_chef}
+          />
         </div>
       </div>
 

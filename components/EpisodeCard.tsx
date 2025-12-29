@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Image from 'next/image';
+import AdaptiveImage from './AdaptiveImage';
 import type { BlackWhiteChefCard } from '@/types/blackWhiteChef';
 
 interface EpisodeCardProps {
@@ -17,12 +17,14 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
       {/* Image Placeholder */}
       <div className="relative aspect-[16/9] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center overflow-hidden">
         {episode.thumbnail ? (
-          <Image
-            src={episode.thumbnail}
+          <AdaptiveImage
+            basePath={episode.thumbnail}
             alt={`${episode.regionDetailName} ${episode.ingredient}`}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            quality={85}
+            loading="lazy"
           />
         ) : (
           <div className="text-center text-gray-400">

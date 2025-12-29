@@ -4,6 +4,10 @@
 
 Build a content-first web experience using existing translated data.
 
+## Domain
+
+- https://koreanow.app
+
 ## Pages
 
 - Home

@@ -109,7 +109,7 @@ function transformToCard(episode: BlackWhiteChefEpisode): BlackWhiteChefCard {
     ingredient,
     description,
     chefs: episode.related_chef,
-    thumbnail: episode.image_srcs && episode.image_srcs.length > 0 ? episode.image_srcs[0] : null,
+    thumbnail: `/black_white_chef/${episode.region_detail_name_eng}/1`,
   };
 }
 
@@ -135,7 +135,20 @@ export async function getBlackWhiteChefEpisodes(): Promise<BlackWhiteChefCard[]>
     }
 
     // Transform to card format
-    return data.map(transformToCard);
+    const cards = data.map(transformToCard);
+
+    // Group by (region_detail_name_eng, episode) to remove duplicates
+    // Keep one entry per region per episode
+    const uniqueEpisodes = new Map<string, BlackWhiteChefCard>();
+    cards.forEach(card => {
+      const key = `${card.regionDetailName}-${card.episode}`;
+      // Keep the first occurrence (or use !uniqueEpisodes.has(key) to always keep first)
+      if (!uniqueEpisodes.has(key)) {
+        uniqueEpisodes.set(key, card);
+      }
+    });
+
+    return Array.from(uniqueEpisodes.values());
   } catch (error) {
     console.error('Error in getBlackWhiteChefEpisodes:', error);
     return [];
