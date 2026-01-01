@@ -14,8 +14,6 @@ export default function BlackWhiteChefSection({ episodes }: BlackWhiteChefSectio
 
   return (
     <section id="black-white-chef" className="relative bg-gradient-to-br from-gray-50 to-white overflow-hidden">
-      {/* Decorative top border */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gray-900 via-gray-700 to-gray-900" />
 
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-5 min-h-[700px]">

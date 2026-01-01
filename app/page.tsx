@@ -41,7 +41,7 @@ export default async function Home({
     <div className="min-h-screen">
       {/* Hero Section - Site Introduction */}
       <section className="bg-gradient-to-br from-gray-900 to-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <div className="max-w-3xl">
             <h1 className="text-5xl md:text-7xl font-serif font-bold text-white mb-6 leading-tight">
               What Koreans Are Really Eating — Right Now
@@ -49,6 +49,15 @@ export default async function Home({
             <p className="text-xl md:text-2xl text-gray-300 leading-relaxed">
               Not ads or sponsored picks — just places Koreans actually go.
             </p>
+
+            {/* Trust / Credibility Text */}
+            <div className="mt-10 pt-8 border-t border-white/20">
+              <p className="text-sm md:text-base text-gray-400 leading-relaxed">
+                <span className="font-semibold text-white">Why KoreaNow?</span>
+                <br />
+                Curated by a Korean creator, highlighting where locals actually eat — not tourist hotspots, not paid lists.
+              </p>
+            </div>
           </div>
         </div>
       </section>
