@@ -465,3 +465,84 @@ export async function getRegions(): Promise<string[]> {
 
   return result;
 }
+
+/**
+ * Get adjacent restaurants (previous and next) for navigation
+ * Supports filtering by region, region_detail, and region_detail_name
+ * Returns only minimal fields needed for navigation cards
+ */
+export const getAdjacentRestaurants = cache(async (
+  currentCreatedAt: string,
+  region?: string,
+  regionDetail?: string,
+  regionDetailName?: string
+): Promise<{ prev: RestaurantTranslation | null; next: RestaurantTranslation | null }> => {
+  // Build base query for previous restaurant (newer in list order)
+  let prevQuery = supabase
+    .from('popular_restaurants_localizations')
+    .select(`
+      *,
+      popular_restaurants!inner(image_url, url)
+    `)
+    .eq('lang', 'en')
+    .gt('created_at', currentCreatedAt)
+    .order('created_at', { ascending: true })
+    .limit(1);
+
+  // Build base query for next restaurant (older in list order)
+  let nextQuery = supabase
+    .from('popular_restaurants_localizations')
+    .select(`
+      *,
+      popular_restaurants!inner(image_url, url)
+    `)
+    .eq('lang', 'en')
+    .lt('created_at', currentCreatedAt)
+    .order('created_at', { ascending: false })
+    .limit(1);
+
+  // Apply filters to both queries
+  if (region) {
+    const regionUpper = region.toUpperCase();
+    if (regionUpper === 'SEOUL') {
+      prevQuery = prevQuery.or('region_name.ilike.GANGNAM%,region_name.ilike.GANGBUK%');
+      nextQuery = nextQuery.or('region_name.ilike.GANGNAM%,region_name.ilike.GANGBUK%');
+    } else {
+      prevQuery = prevQuery.ilike('region_name', `${regionUpper}%`);
+      nextQuery = nextQuery.ilike('region_name', `${regionUpper}%`);
+    }
+  }
+
+  if (regionDetail) {
+    prevQuery = prevQuery.eq('region_detail', regionDetail);
+    nextQuery = nextQuery.eq('region_detail', regionDetail);
+  }
+
+  if (regionDetailName) {
+    prevQuery = prevQuery.eq('region_detail_name', regionDetailName);
+    nextQuery = nextQuery.eq('region_detail_name', regionDetailName);
+  }
+
+  // Execute queries in parallel
+  const [prevResult, nextResult] = await Promise.all([
+    prevQuery.maybeSingle(),
+    nextQuery.maybeSingle(),
+  ]);
+
+  // Map results to include original_image_url and original_url
+  const prev = prevResult.data ? {
+    ...prevResult.data,
+    original_image_url: prevResult.data.popular_restaurants?.image_url,
+    original_url: prevResult.data.popular_restaurants?.url,
+    popular_restaurants: undefined,
+  } : null;
+
+  const next = nextResult.data ? {
+    ...nextResult.data,
+    original_image_url: nextResult.data.popular_restaurants?.image_url,
+    original_url: nextResult.data.popular_restaurants?.url,
+    popular_restaurants: undefined,
+  } : null;
+
+  return { prev, next };
+});

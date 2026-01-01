@@ -6,17 +6,38 @@ import { generateRestaurantSlug } from '@/lib/utils/slug';
 interface RestaurantCardProps {
   restaurant: RestaurantTranslation;
   priority?: boolean;
+  currentRegion?: string;
+  currentRegionDetail?: string;
+  currentRegionDetailName?: string;
 }
 
-export default function RestaurantCard({ restaurant, priority = false }: RestaurantCardProps) {
+export default function RestaurantCard({
+  restaurant,
+  priority = false,
+  currentRegion,
+  currentRegionDetail,
+  currentRegionDetailName,
+}: RestaurantCardProps) {
   // Generate SEO-friendly slug: {region}-{restaurant-name}
   const slug = generateRestaurantSlug(restaurant.name, restaurant.region_name || undefined);
 
   // Use original image from popular_restaurants, fallback to localized image
   const imageUrl = restaurant.original_image_url || restaurant.image_url;
 
+  // Build query params to maintain filter context
+  const buildQueryParams = () => {
+    const params = new URLSearchParams();
+    if (currentRegion) params.set('region', currentRegion);
+    if (currentRegionDetail) params.set('region_detail', currentRegionDetail);
+    if (currentRegionDetailName) params.set('region_detail_name', currentRegionDetailName);
+    const queryString = params.toString();
+    return queryString ? `?${queryString}` : '';
+  };
+
+  const queryParams = buildQueryParams();
+
   return (
-    <Link href={`/restaurants/${slug}`} className="group block">
+    <Link href={`/restaurants/${slug}${queryParams}`} className="group block">
       <article className="bg-white overflow-hidden transition-all duration-300 hover:shadow-2xl">
         {/* Image Section */}
         {imageUrl && (

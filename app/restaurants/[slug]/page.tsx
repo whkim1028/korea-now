@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
-import { getFullRestaurantBySlug, getRestaurants } from '@/lib/data/restaurants';
+import { getFullRestaurantBySlug, getRestaurants, getAdjacentRestaurants } from '@/lib/data/restaurants';
 import { generateRestaurantSlug } from '@/lib/utils/slug';
 import GlossarySection from '@/components/GlossarySection';
 import ImageCarousel from '@/components/ImageCarousel';
 import MenuImageGallery from '@/components/MenuImageGallery';
 import GoogleMap from '@/components/GoogleMap';
 import TextWithGlossary from '@/components/TextWithGlossary';
+import RestaurantNavigation from '@/components/RestaurantNavigation';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
@@ -15,6 +16,11 @@ export const revalidate = 3600; // Revalidate every 1 hour
 interface RestaurantPageProps {
   params: Promise<{
     slug: string;
+  }>;
+  searchParams: Promise<{
+    region?: string;
+    region_detail?: string;
+    region_detail_name?: string;
   }>;
 }
 
@@ -60,13 +66,24 @@ export async function generateMetadata({ params }: RestaurantPageProps): Promise
   };
 }
 
-export default async function RestaurantPage({ params }: RestaurantPageProps) {
+export default async function RestaurantPage({ params, searchParams }: RestaurantPageProps) {
   const { slug } = await params;
+  const filters = await searchParams;
   const restaurant = await getFullRestaurantBySlug(slug);
 
   if (!restaurant) {
     notFound();
   }
+
+  // Get adjacent restaurants for navigation, maintaining filter context
+  const { prev, next } = restaurant.created_at
+    ? await getAdjacentRestaurants(
+        restaurant.created_at,
+        filters.region,
+        filters.region_detail,
+        filters.region_detail_name
+      )
+    : { prev: null, next: null };
 
   // Helper function to safely convert to string with line breaks
   const toHtmlString = (value: any): string => {
@@ -428,6 +445,15 @@ export default async function RestaurantPage({ params }: RestaurantPageProps) {
           (!Array.isArray(combinedGlossary) && Object.keys(combinedGlossary).length > 0)) && (
           <GlossarySection glossary={combinedGlossary} />
         )}
+
+        {/* Restaurant Navigation */}
+        <RestaurantNavigation
+          prev={prev}
+          next={next}
+          region={filters.region}
+          regionDetail={filters.region_detail}
+          regionDetailName={filters.region_detail_name}
+        />
       </div>
     </article>
   );

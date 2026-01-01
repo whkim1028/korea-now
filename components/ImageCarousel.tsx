@@ -46,9 +46,18 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
   if (images.length === 1) {
     return (
       <>
-        <button
+        <div
           onClick={openModal}
           className="group w-full h-96 relative cursor-pointer overflow-hidden"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openModal();
+            }
+          }}
+          aria-label="Open image in full screen"
         >
           <Image
             src={images[0]}
@@ -77,7 +86,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
               </svg>
             </div>
           </div>
-        </button>
+        </div>
 
         {/* Modal */}
         {isModalOpen && (
@@ -120,9 +129,18 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
 
   return (
     <>
-      <button
+      <div
         onClick={openModal}
         className="relative w-full h-96 group cursor-pointer overflow-hidden"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openModal();
+          }
+        }}
+        aria-label="Open image in full screen"
       >
         {/* Main Image */}
         <Image
@@ -228,7 +246,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
             {currentIndex + 1} / {images.length}
           </div>
         )}
-      </button>
+      </div>
 
       {/* Modal */}
       {isModalOpen && (
