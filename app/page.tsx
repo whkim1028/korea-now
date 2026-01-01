@@ -12,6 +12,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const runtime = "edge";
+export const revalidate = 1800; // Revalidate every 30 minutes
 
 export const metadata: Metadata = {
   alternates: {
@@ -208,8 +209,12 @@ export default async function Home({
 
             {/* Restaurant Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {trendingRestaurants.map((restaurant) => (
-                <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+              {trendingRestaurants.map((restaurant, index) => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  priority={index < 3}
+                />
               ))}
             </div>
 
@@ -336,8 +341,12 @@ export default async function Home({
               </Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-              {featuredEditorials.map((editorial) => (
-                <EditorialCard key={editorial.id} editorial={editorial} />
+              {featuredEditorials.map((editorial, index) => (
+                <EditorialCard
+                  key={editorial.id}
+                  editorial={editorial}
+                  priority={index === 0}
+                />
               ))}
             </div>
           </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const runtime = "edge";
+export const revalidate = 1800; // Revalidate every 30 minutes
 
 export const metadata: Metadata = {
   title: "Restaurants - KoreaNow",

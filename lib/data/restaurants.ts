@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { RestaurantTranslation, RestaurantDetailTranslation, RestaurantDetail, RestaurantFull } from '@/types/database';
 import { parseRestaurantSlug } from '@/lib/utils/slug';
@@ -59,14 +60,14 @@ export async function getRestaurants(limit?: number, region?: string, regionDeta
     return [];
   }
 
-  // Get URLs for fetching category_translated
+  // Fetch category_translated in a single query for better performance
   const urls = data
     .map(item => item.popular_restaurants?.url)
     .filter(Boolean) as string[];
 
-  // Fetch category_translated from popular_restaurants_detail_translations
   let categoryMap = new Map<string, string>();
   if (urls.length > 0) {
+    // Fetch all categories in one query instead of N queries
     const { data: detailData } = await supabase
       .from('popular_restaurants_detail_translations')
       .select('url, category_translated')
@@ -315,8 +316,9 @@ export async function getFullRestaurantById(id: string): Promise<RestaurantFull 
  * Get full restaurant data by slug (header + detail + raw detail)
  * Slug format: {region}-{restaurant-name}
  * Example: "gangnam-mingles"
+ * Cached to prevent duplicate fetches in generateMetadata and page render
  */
-export async function getFullRestaurantBySlug(slug: string): Promise<RestaurantFull | null> {
+export const getFullRestaurantBySlug = cache(async (slug: string): Promise<RestaurantFull | null> => {
   const restaurant = await getRestaurantBySlug(slug);
 
   if (!restaurant) {
@@ -343,7 +345,7 @@ export async function getFullRestaurantBySlug(slug: string): Promise<RestaurantF
     detail: detail ?? undefined,
     detailRaw: detailRaw ?? undefined,
   };
-}
+});
 
 /**
  * Get full restaurant data (header + detail + raw detail) - DEPRECATED
@@ -433,8 +435,10 @@ export async function getRegions(): Promise<string[]> {
     return [];
   }
 
-  // Convert region codes to uppercase
-  const regionCodes = data.map((item: any) => item.region_code.toUpperCase());
+  // Convert region codes to uppercase, filtering out null values
+  const regionCodes = data
+    .filter((item: any) => item.region_code !== null && item.region_code !== undefined)
+    .map((item: any) => item.region_code.toUpperCase());
 
   console.log('Region codes from DB:', regionCodes);
 

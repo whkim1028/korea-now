@@ -6,9 +6,10 @@ import { generateEditorialSlug } from '@/lib/utils/slug';
 interface EditorialCardProps {
   editorial: EditorialTranslation;
   featured?: boolean;
+  priority?: boolean;
 }
 
-export default function EditorialCard({ editorial, featured = false }: EditorialCardProps) {
+export default function EditorialCard({ editorial, featured = false, priority = false }: EditorialCardProps) {
   // Generate SEO-friendly slug from title
   const slug = generateEditorialSlug(editorial.title_translated);
 
@@ -32,6 +33,7 @@ export default function EditorialCard({ editorial, featured = false }: Editorial
                 alt={editorial.title_translated}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
+                priority={priority}
               />
               <div className="image-overlay-hover" />
             </div>
@@ -68,6 +70,7 @@ export default function EditorialCard({ editorial, featured = false }: Editorial
               alt={editorial.title_translated}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-700"
+              priority={priority}
             />
             <div className="image-overlay-hover" />
           </div>

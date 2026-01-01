@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { EditorialTranslation, EditorialContentTranslation, EditorialFull, RestaurantTranslation } from '@/types/database';
 import { normalizeTitle } from '@/lib/utils/slug';
@@ -190,8 +191,9 @@ export async function getFullEditorialById(id: string): Promise<EditorialFull | 
  * Get full editorial data by slug (for detail page with SEO-friendly URLs)
  * Slug format: {title-keywords}
  * Example: "best-korean-bbq-in-seoul"
+ * Cached to prevent duplicate fetches in generateMetadata and page render
  */
-export async function getFullEditorialBySlug(slug: string): Promise<EditorialFull | null> {
+export const getFullEditorialBySlug = cache(async (slug: string): Promise<EditorialFull | null> => {
   // Use getEditorials() which already has proper joins
   const editorials = await getEditorials();
 
@@ -223,7 +225,7 @@ export async function getFullEditorialBySlug(slug: string): Promise<EditorialFul
 
   // Use the found editorial's ID to get full data
   return getFullEditorialById(match.id);
-}
+});
 
 /**
  * Get full editorial data (header + content + related restaurants)

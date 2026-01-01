@@ -10,7 +10,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 
 export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every 1 hour
 
 interface RestaurantPageProps {
   params: Promise<{

@@ -7,7 +7,7 @@ import EpisodeStructuredData from '@/components/EpisodeStructuredData';
 import type { Metadata } from 'next';
 
 export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // Revalidate every 1 hour
 
 interface EpisodePageProps {
   params: Promise<{
