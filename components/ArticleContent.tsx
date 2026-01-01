@@ -9,9 +9,10 @@ interface ArticleContentProps {
   content: string;
   images?: string[];
   glossary?: Glossary | Array<{term: string; explain: string}>;
+  title?: string;
 }
 
-export default function ArticleContent({ content, images = [], glossary }: ArticleContentProps) {
+export default function ArticleContent({ content, images = [], glossary, title }: ArticleContentProps) {
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
   // Convert glossary to map
@@ -180,7 +181,7 @@ export default function ArticleContent({ content, images = [], glossary }: Artic
                   >
                     <Image
                       src={images[imageIndex]}
-                      alt={`Article image ${imageIndex + 1}`}
+                      alt={title ? `${title} - image ${imageIndex + 1}` : `Article image ${imageIndex + 1}`}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, 800px"
@@ -273,7 +274,7 @@ export default function ArticleContent({ content, images = [], glossary }: Artic
           >
             <Image
               src={images[selectedImageIndex]}
-              alt={`Article image ${selectedImageIndex + 1}`}
+              alt={title ? `${title} - image ${selectedImageIndex + 1}` : `Article image ${selectedImageIndex + 1}`}
               fill
               className="object-contain"
               sizes="100vw"

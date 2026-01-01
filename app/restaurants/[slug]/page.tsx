@@ -193,7 +193,10 @@ export default async function RestaurantPage({ params, searchParams }: Restauran
       {/* Hero Section with Image Carousel */}
       {images.length > 0 && (
         <div className="relative">
-          <ImageCarousel images={images} alt={restaurant.name} />
+          <ImageCarousel
+            images={images}
+            alt={`${restaurant.name}${restaurant.detail?.category_translated ? ` ${restaurant.detail.category_translated}` : ''} restaurant${restaurant.region_name ? ` in ${restaurant.region_name}` : ''} - interior and dishes`}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
           <div className="absolute bottom-0 left-0 right-0 p-8 pointer-events-none">
             <div className="max-w-4xl mx-auto">

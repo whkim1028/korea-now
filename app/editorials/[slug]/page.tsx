@@ -155,6 +155,7 @@ export default async function EditorialPage({ params }: EditorialPageProps) {
             content={editorial.content.content_translated}
             images={editorial.content.images}
             glossary={combinedGlossary}
+            title={editorial.title_translated}
           />
         )}
 

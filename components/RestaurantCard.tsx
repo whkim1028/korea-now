@@ -44,7 +44,7 @@ export default function RestaurantCard({
           <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100">
             <Image
               src={imageUrl}
-              alt={restaurant.name}
+              alt={`${restaurant.name}${restaurant.category_translated ? ` - ${restaurant.category_translated}` : ''} restaurant${restaurant.region_name ? ` in ${restaurant.region_name}` : ''}`}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               priority={priority}

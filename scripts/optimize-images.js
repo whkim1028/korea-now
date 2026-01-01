@@ -47,7 +47,7 @@ async function optimizeImage(inputPath, outputPath, backupPath) {
     const originalSizeMB = (originalStats.size / 1024 / 1024).toFixed(2);
 
     // Optimize and convert to WebP
-    const outputPathWebP = outputPath.replace(/\.jpe?g$/i, '.webp');
+    const outputPathWebP = outputPath.replace(/\.(jpe?g|png)$/i, '.webp');
 
     await sharp(inputPath)
       .resize(MAX_WIDTH, null, {
@@ -63,7 +63,7 @@ async function optimizeImage(inputPath, outputPath, backupPath) {
     const reduction = ((1 - optimizedStats.size / originalStats.size) * 100).toFixed(1);
 
     console.log(`   Optimized: ${path.basename(inputPath)}`);
-    console.log(`    ${originalSizeMB} MB ’ ${optimizedSizeMB} MB (${reduction}% smaller)`);
+    console.log(`    ${originalSizeMB} MB ï¿½ ${optimizedSizeMB} MB (${reduction}% smaller)`);
 
     return { original: originalStats.size, optimized: optimizedStats.size };
   } catch (error) {
@@ -84,13 +84,13 @@ async function processDirectory(dirPath) {
       // Skip backup directory
       if (item === 'black_white_chef_backup') continue;
 
-      console.log(`\n=Á Processing folder: ${item}`);
+      console.log(`\n=ï¿½ Processing folder: ${item}`);
       const subStats = await processDirectory(itemPath);
       stats.totalOriginal += subStats.totalOriginal;
       stats.totalOptimized += subStats.totalOptimized;
       stats.count += subStats.count;
-    } else if (/\.(jpe?g)$/i.test(item)) {
-      // Process JPEG files
+    } else if (/\.(jpe?g|png)$/i.test(item)) {
+      // Process JPEG and PNG files
       const relativePath = path.relative(BASE_DIR, itemPath);
       const backupPath = path.join(BACKUP_DIR, relativePath);
       const outputPath = itemPath;
@@ -106,7 +106,7 @@ async function processDirectory(dirPath) {
 }
 
 async function main() {
-  console.log('=¼  Black & White Chef Image Optimization\n');
+  console.log('=ï¿½  Black & White Chef Image Optimization\n');
   console.log('Settings:');
   console.log(`  - Max width: ${MAX_WIDTH}px`);
   console.log(`  - Quality: ${QUALITY}%`);
@@ -134,7 +134,7 @@ async function main() {
   }
 
   console.log(`  - Time taken: ${duration}s`);
-  console.log(`\n=¡ Next steps:`);
+  console.log(`\n=ï¿½ Next steps:`);
   console.log(`  1. Update code to use .webp extensions`);
   console.log(`  2. Test the website to ensure images load correctly`);
   console.log(`  3. Original files are backed up in: ${BACKUP_DIR}`);

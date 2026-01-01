@@ -53,7 +53,7 @@ export default function MenuImageGallery({ images, restaurantName }: MenuImageGa
           >
             <Image
               src={imageUrl}
-              alt={`${restaurantName} menu ${idx + 1}`}
+              alt={`${restaurantName} restaurant menu - Korean cuisine dishes`}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-110"
               sizes="(max-width: 768px) 50vw, 33vw"
@@ -142,7 +142,7 @@ export default function MenuImageGallery({ images, restaurantName }: MenuImageGa
           >
             <Image
               src={images[selectedIndex]}
-              alt={`${restaurantName} menu ${selectedIndex + 1}`}
+              alt={`${restaurantName} restaurant menu - Korean cuisine dishes`}
               fill
               className="object-contain"
               sizes="100vw"
