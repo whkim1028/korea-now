@@ -198,9 +198,9 @@ export default async function RestaurantPage({ params, searchParams }: Restauran
             alt={`${restaurant.name}${restaurant.detail?.category_translated ? ` ${restaurant.detail.category_translated}` : ''} restaurant${restaurant.region_name ? ` in ${restaurant.region_name}` : ''} - interior and dishes`}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-          <div className="absolute bottom-0 left-0 right-0 p-8 pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 px-4 py-6 md:p-8 pointer-events-none">
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-5xl md:text-6xl font-serif font-bold text-white mb-4 drop-shadow-lg">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold text-white mb-4 drop-shadow-lg">
                 {restaurant.detail?.name_translated || restaurant.name}
               </h1>
               {restaurant.detail?.summary_short && (
