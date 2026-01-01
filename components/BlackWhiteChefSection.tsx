@@ -23,7 +23,7 @@ export default function BlackWhiteChefSection({ episodes }: BlackWhiteChefSectio
           <div className="lg:col-span-2 relative p-6 lg:p-8 py-8 lg:py-12">
             <div className="relative h-[500px] lg:h-full rounded-2xl overflow-hidden shadow-2xl bg-gray-900">
               <Image
-                src="/black_white_chef/main_poster.gif"
+                src="/black_white_chef/main_poster_1.webp"
                 alt="Culinary Class Wars - Season 2"
                 fill
                 className="object-contain"
