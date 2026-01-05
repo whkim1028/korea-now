@@ -186,3 +186,29 @@ export async function getBlackWhiteChefEpisodeById(id: string): Promise<BlackWhi
     return null;
   }
 }
+
+/**
+ * Get restaurant note for an episode
+ * Returns the first note from bw_chef_intf_popular_restaurants table
+ */
+export async function getEpisodeRestaurantNote(episodeId: string): Promise<string | null> {
+  try {
+    const { data, error } = await supabase
+      .from('bw_chef_intf_popular_restaurants')
+      .select('note')
+      .eq('black_white_chef_id', episodeId)
+      .not('note', 'is', null)
+      .limit(1)
+      .single();
+
+    if (error) {
+      // No matching row or other error - return null
+      return null;
+    }
+
+    return data?.note || null;
+  } catch (error) {
+    console.error('Error in getEpisodeRestaurantNote:', error);
+    return null;
+  }
+}

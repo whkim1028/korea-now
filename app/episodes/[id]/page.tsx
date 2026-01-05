@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getBlackWhiteChefEpisodeById } from '@/lib/data/blackWhiteChef';
+import { getBlackWhiteChefEpisodeById, getEpisodeRestaurantNote } from '@/lib/data/blackWhiteChef';
 import { REGION_NAME_TO_CODE, REGION_NAME_TO_DISPLAY } from '@/types/blackWhiteChef';
 import Link from 'next/link';
 import ImageGallery from '@/components/ImageGallery';
@@ -102,6 +102,9 @@ export default async function EpisodePage({ params }: EpisodePageProps) {
     notFound();
   }
 
+  // Get restaurant note from bw_chef_intf_popular_restaurants table
+  const restaurantNote = await getEpisodeRestaurantNote(id);
+
   const regionCode = REGION_NAME_TO_CODE[episode.region_name] || episode.region_name.toUpperCase();
   const regionDisplay = REGION_NAME_TO_DISPLAY[episode.region_name] || episode.region_name;
   const restaurantLink = `/restaurants?region=${regionCode}&region_detail_name=${episode.region_detail_name_eng}`;
@@ -193,6 +196,37 @@ export default async function EpisodePage({ params }: EpisodePageProps) {
                   </h2>
                   <p className="text-base text-gray-700 leading-relaxed">
                     {episode.note}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Restaurant Notes */}
+        {restaurantNote && (
+          <div className="mb-12 pb-12 border-b border-gray-200">
+            <div className="bg-blue-50 rounded-xl p-6 border-l-4 border-blue-400">
+              <div className="flex items-start gap-3">
+                <svg
+                  className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
+                </svg>
+                <div>
+                  <h2 className="text-xl font-serif font-bold text-gray-900 mb-2">
+                    About the Restaurants
+                  </h2>
+                  <p className="text-base text-gray-700 leading-relaxed">
+                    {restaurantNote}
                   </p>
                 </div>
               </div>
