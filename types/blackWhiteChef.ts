@@ -10,6 +10,7 @@ export interface BlackWhiteChefEpisode {
   region_detail_name_eng: string; // 영문 세부지역명 (예: "Jindo")
   related_chef: string; // 셰프 이름들 (예: "Choi Kang-rok vs Musipal")
   episode_desc: string; // 영어 설명
+  note?: string; // 에피소드 특이사항/비고 (선택적)
   image_srcs: string[]; // 이미지 URL 배열
   is_active: boolean;
   created_at: string;

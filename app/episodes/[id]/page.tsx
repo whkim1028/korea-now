@@ -161,11 +161,42 @@ export default async function EpisodePage({ params }: EpisodePageProps) {
         {episode.related_chef && (
           <div className="mb-12 pb-12 border-b border-gray-200">
             <h2 className="text-2xl font-serif font-bold text-gray-900 mb-4">
-              Competing Chefs
+              Related Chefs
             </h2>
             <p className="text-lg text-gray-700">
               {episode.related_chef}
             </p>
+          </div>
+        )}
+
+        {/* Episode Notes */}
+        {episode.note && (
+          <div className="mb-12 pb-12 border-b border-gray-200">
+            <div className="bg-amber-50 rounded-xl p-6 border-l-4 border-amber-400">
+              <div className="flex items-start gap-3">
+                <svg
+                  className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+                <div>
+                  <h2 className="text-xl font-serif font-bold text-gray-900 mb-2">
+                    Episode Notes
+                  </h2>
+                  <p className="text-base text-gray-700 leading-relaxed">
+                    {episode.note}
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
